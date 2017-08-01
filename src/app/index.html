@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="FoldApp Interface for Airbitz" />
+    <meta charset=utf-8 />
+    <style>
+      body {
+        user-select: none;
+        -moz-user-select: none;
+      }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+  <h4>API Token: <span id="apiToken"></span></h4>
+  <hr />
+  <input id="title" type="text" value="Plugin Name" style="width:100%" />
+  <hr />
+
+  <button id="navPush">Nav Push</button>
+  <button id="navPop">Nav Pop</button>
+  <button id="navClear">Nav Clear</button><br />
+
+  <button id="back">Back</button>
+  <button id="exit">Exit</button><br />
+  <hr />
+
+  <textarea id="data" style="width: 100%" rows="10">
+  </textarea>
+  <button id="writeData">Write Data</button>
+  <button id="clearData">Clear Data</button><br />
+  <button id="changeWallet">Choose Wallet</button><br />
+  <textarea id="currentWallet" style="width: 100%" rows="5">
+  </textarea>
+  <button id="wallets">Wallets</button><br />
+  <textarea id="walletsData" style="width: 100%" rows="10">
+  </textarea>
+  <textarea id="addressData" style="width: 100%" rows="3">
+  </textarea>
+
+  <hr />
+  <input type="text" id="sendAddress" placeholder="Address" /><br />
+  <input type="text" id="sendAmount" placeholder="Amount" /><br />
+  <button id="send">Send</button><br />
+  <hr />
+  <button id="debugLevel">Log</button><br />
+  <button id="showAlert">Show Alert</button><br />
+  <button id="openAirbitz">Open Airbitz.co</button><br />
+  <hr />
+</div>
+<script type="text/javascript" src="js/bundle.js"></script>
+</body>
+</html>
+

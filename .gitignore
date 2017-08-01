@@ -1,0 +1,6 @@
+/lib
+/node_modules
+.cli
+.idea
+*.swp
+.env.local

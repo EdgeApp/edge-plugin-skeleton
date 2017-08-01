@@ -1,0 +1,46 @@
+{
+  "name": "edge-plugin-skeleton",
+  "version": "0.0.1",
+  "description": "Skeleton plugin for edge",
+  "respository": {
+    "type": "git",
+    "url": "http://github.com/edge/edge-plugin-skeleton.git"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "build": "webpack",
+    "edge": "mkdir -p target && npm run build && edge-ify -o target -s src/app",
+    "dev": "edge-plugin-devserver",
+    "clean": "rimraf target; mkdir target",
+    "lint": "eslint --parser babel-eslint ./src/**/*.js",
+    "lint:fix": "npm run lint -- --fix",
+    "flow:0": "flow; exit 0",
+    "flow": "flow",
+    "test": "npm run lint:fix",
+    "precommit": "npm test"
+  },
+  "author": "Tim Horton <tim@edgesecure.co>",
+  "license": "SEE LICENSE IN LICENSE",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-eslint": "^7.2.3",
+    "edge-libplugin": "https://github.com/teneighty/edge-libplugin.git",
+    "edge-plugin-devserver": "https://github.com/teneighty/edge-plugin-devserver.git",
+    "eslint": "^4.4.1",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-flowtype": "^2.35.0",
+    "eslint-plugin-import": "^2.3.0",
+    "eslint-plugin-node": "^5.0.0",
+    "eslint-plugin-promise": "^3.4.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "flow-bin": "^0.54.1",
+    "husky": "^0.14.3",
+    "jquery": "^3.2.1",
+    "rimraf": "^2.5.4",
+    "webpack": "^3.4.1"
+  },
+  "files": [
+    "target/index.html",
+    "manifest.json"
+  ]
+}

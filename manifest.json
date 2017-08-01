@@ -1,0 +1,12 @@
+{
+  "pluginId": "co.edgesecure.skeleton",
+  "name": "Skeleton",
+  "subtitle": "A sample plugin application",
+  "provider": "Edge Secure",
+  "iconUrl": "https://airbitz.co/go/wp-content/uploads/2016/08/Screen-Shot-2016-08-18-at-1.36.56-AM.png",
+  "environment": {
+    "country": "US",
+    "SANDBOX": true,
+    "API_TOKEN": "my-api-token"
+  }
+}
