@@ -24,8 +24,7 @@
   "dependencies": {},
   "devDependencies": {
     "babel-eslint": "^7.2.3",
-    "edge-libplugin": "https://github.com/teneighty/edge-libplugin.git",
-    "edge-plugin-devserver": "https://github.com/teneighty/edge-plugin-devserver.git",
+    "edge-libplugin": "https://github.com/EdgeApp/edge-libplugin.git",
     "eslint": "^4.4.1",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-flowtype": "^2.35.0",
