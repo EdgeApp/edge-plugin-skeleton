@@ -4,7 +4,7 @@
   "description": "Skeleton plugin for edge",
   "respository": {
     "type": "git",
-    "url": "http://github.com/kylanhurt/edge-plugin.git"
+    "url": "http://github.com/edge/edge-plugin-skeleton.git"
   },
   "main": "src/index.js",
   "scripts": {
