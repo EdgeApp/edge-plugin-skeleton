@@ -1,10 +1,10 @@
 {
-  "name": "edge-plugin-skeleton",
+  "name": "edge-plugin-kylan",
   "version": "0.0.1",
   "description": "Skeleton plugin for edge",
   "respository": {
     "type": "git",
-    "url": "http://github.com/edge/edge-plugin-skeleton.git"
+    "url": "http://github.com/kylanhurt/edge-plugin.git"
   },
   "main": "src/index.js",
   "scripts": {
@@ -21,11 +21,12 @@
   },
   "author": "Tim Horton <tim@edgesecure.co>",
   "license": "SEE LICENSE IN LICENSE",
-  "dependencies": {},
+  "dependencies": {
+    "webpack-dev-server": "^3.1.8"
+  },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
-    "edge-libplugin": "https://github.com/teneighty/edge-libplugin.git",
-    "edge-plugin-devserver": "https://github.com/teneighty/edge-plugin-devserver.git",
+    "edge-libplugin": "https://github.com/EdgeApp/edge-libplugin.git",
     "eslint": "^4.4.1",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-flowtype": "^2.35.0",

@@ -13,6 +13,7 @@
 </head>
 <body>
 <div class="container-fluid">
+  <h4>Kylans Plugin</h4>
   <h4>API Token: <span id="apiToken"></span></h4>
   <hr>
   <input id="title" type="text" value="Plugin Name" style="width:100%">
@@ -112,7 +113,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -120,83 +121,9 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = postWrapper;
-// Repurposed ideas from: https://gist.github.com/blankg/d5537a458b55b9d15cb4fd78258ad840
-let promiseChain = new Promise(function(resolve, reject) {
-  function tryAgain() {
-    if (window.postMessage.length !== 1) {
-      setTimeout(() => {
-        resolve()
-      }, 100)
-    } else {
-      resolve()
-    }
-  }
-  tryAgain()
-})
-const callbacks = {}
-const promises = {}
-const guid = function () {
-  function s4 () {
-    return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1)
-  }
-  return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
-}
-
-function postWrapper (args) {
-  // Add callback id to args
-  args.cbid = guid()
-  // Queue up message
-  promiseChain = promiseChain.then(function () {
-    return new Promise(function (resolve, reject) {
-      promises[args.cbid] = {
-        resolve: resolve,
-        reject: reject
-      }
-      window.postMessage(JSON.stringify(args), '*')
-    })
-  })
-  return new Promise((resolve, reject) => {
-    callbacks[args.cbid] = (err, data) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(data)
-      }
-    }
-  })
-}
-
-function nextMessage (cbid) {
-  if (promises[cbid]) {
-    promises[cbid].resolve()
-    delete promises[cbid]
-  }
-}
-
-function pluginReturn (data) {
-  const {cbid, err, res} = JSON.parse(data)
-  if (callbacks[cbid]) {
-    callbacks[cbid](err, res)
-    delete callbacks[cbid]
-    return true
-  } else {
-    return false
-  }
-}
-
-document.PLUGIN_NEXT = window.PLUGIN_NEXT = nextMessage
-document.PLUGIN_RETURN = window.PLUGIN_RETURN = pluginReturn
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_edge_libplugin__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_edge_libplugin__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_jquery__);
 
 
@@ -341,93 +268,125 @@ __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#exit').click(function () {
 
 
 /***/ }),
-/* 2 */
+/* 1 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_js__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__config_js__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_js__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_js__ = __webpack_require__(6);
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_0__core_js__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_1__config_js__; });
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_2__ui_js__; });
-/* unused harmony reexport utils */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return core; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return config; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return ui; });
+/* unused harmony export utils */
+// Repurposed ideas from: https://gist.github.com/blankg/d5537a458b55b9d15cb4fd78258ad840
+var promiseChain = new Promise(function (resolve, reject) {
+  function tryAgain() {
+    if (window.postMessage.length !== 1) {
+      setTimeout(function () {
+        tryAgain();
+      }, 250);
+    } else {
+      resolve();
+    }
+  }
+  tryAgain();
+});
+var callbacks = {};
+var promises = {};
+var guid = function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+};
 
+function postWrapper(args) {
+  // Add callback id to args
+  args.cbid = guid();
+  // Queue up message
+  promiseChain = promiseChain.then(function () {
+    return new Promise(function (resolve, reject) {
+      promises[args.cbid] = {
+        resolve: resolve,
+        reject: reject
+      };
+      window.postMessage(JSON.stringify(args), '*');
+    });
+  });
+  return new Promise(function (resolve, reject) {
+    callbacks[args.cbid] = function (err, data) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    };
+  });
+}
 
+function nextMessage(cbid) {
+  if (promises[cbid]) {
+    promises[cbid].resolve();
+    delete promises[cbid];
+  }
+}
 
+function pluginReturn(data) {
+  var _JSON$parse = JSON.parse(data),
+      cbid = _JSON$parse.cbid,
+      err = _JSON$parse.err,
+      res = _JSON$parse.res;
 
+  if (callbacks[cbid]) {
+    callbacks[cbid](err, res);
+    delete callbacks[cbid];
+    return true;
+  } else {
+    return false;
+  }
+}
 
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (immutable) */ __webpack_exports__["bitidAddress"] = bitidAddress;
-/* harmony export (immutable) */ __webpack_exports__["bitidSignature"] = bitidSignature;
-/* harmony export (immutable) */ __webpack_exports__["chooseWallet"] = chooseWallet;
-/* harmony export (immutable) */ __webpack_exports__["selectedWallet"] = selectedWallet;
-/* harmony export (immutable) */ __webpack_exports__["wallets"] = wallets;
-/* harmony export (immutable) */ __webpack_exports__["getAddress"] = getAddress;
-/* harmony export (immutable) */ __webpack_exports__["finalizeReceiveRequest"] = finalizeReceiveRequest;
-/* harmony export (immutable) */ __webpack_exports__["createSpendRequest"] = createSpendRequest;
-/* harmony export (immutable) */ __webpack_exports__["createSpendRequest2"] = createSpendRequest2;
-/* harmony export (immutable) */ __webpack_exports__["requestSign"] = requestSign;
-/* harmony export (immutable) */ __webpack_exports__["broadcastTx"] = broadcastTx;
-/* harmony export (immutable) */ __webpack_exports__["saveTx"] = saveTx;
-/* harmony export (immutable) */ __webpack_exports__["requestFile"] = requestFile;
-/* harmony export (immutable) */ __webpack_exports__["writeData"] = writeData;
-/* harmony export (immutable) */ __webpack_exports__["clearData"] = clearData;
-/* harmony export (immutable) */ __webpack_exports__["readData"] = readData;
-/* harmony export (immutable) */ __webpack_exports__["formatCurrency"] = formatCurrency;
-/* harmony export (immutable) */ __webpack_exports__["debugLevel"] = debugLevel;
-/* harmony export (immutable) */ __webpack_exports__["getAffiliateInfo"] = getAffiliateInfo;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__bridge_js__ = __webpack_require__(0);
-
+document.PLUGIN_NEXT = window.PLUGIN_NEXT = nextMessage;
+document.PLUGIN_RETURN = window.PLUGIN_RETURN = pluginReturn;
 
 /**
  * Returns a bitid address for the given uri and message
  * @return {string} bitid address
  */
-function bitidAddress (uri, message) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({
+function bitidAddress(uri, message) {
+  return postWrapper({
     func: 'bitidAddress', uri: uri, message: message
-  })
+  });
 }
 
 /**
  * Returns a bitid signature for the given uri and message
  * @return {string} bitid signature
  */
-function bitidSignature (uri, message) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'bitidSignature', uri, message})
+function bitidSignature(uri, message) {
+  return postWrapper({ func: 'bitidSignature', uri: uri, message: message });
+}
+
+/**
+ * Launches UI modal to select a wallet
+ * @return promise
+ */
+function chooseWallet() {
+  return postWrapper({ func: 'chooseWallet' });
 }
 
 /**
  * Returns the user's currently selected wallet
  * @return promise
  */
-function chooseWallet (options) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'chooseWallet', options})
-}
-
-/**
- * Returns the user's currently selected wallet
- * @return promise
- */
-function selectedWallet (options) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'selectedWallet', options})
+function selectedWallet() {
+  return postWrapper({ func: 'selectedWallet' });
 }
 
 /**
  * Returns a list of the wallets for this account, included archived wallets
  * @return {object} an array of wallets
  */
-function wallets (options) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'wallets', options})
+function wallets(options) {
+  return postWrapper({ func: 'wallets', options: options });
 }
 
 /**
@@ -435,8 +394,8 @@ function wallets (options) {
  * @param {object} walletId - the walletId object
  * @return {object} currencyCode - currency code
  */
-function getAddress (walletId, currencyCode) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'getAddress', walletId, currencyCode})
+function getAddress(walletId, currencyCode) {
+  return postWrapper({ func: 'getAddress', walletId: walletId, currencyCode: currencyCode });
 }
 
 /**
@@ -448,8 +407,8 @@ function getAddress (walletId, currencyCode) {
  * @param {object} wallet - the wallet object
  * @param {string} requestId - the bitcoin address to finalize
  */
-function finalizeReceiveRequest (wallet, requestId) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'finalizeReceiveRequest', wallet, requestId})
+function finalizeReceiveRequest(wallet, requestId) {
+  return postWrapper({ func: 'finalizeReceiveRequest', wallet: wallet, requestId: requestId });
 }
 
 /**
@@ -458,14 +417,14 @@ function finalizeReceiveRequest (wallet, requestId) {
  * @param {string} toAddress - the recipient address
  * @param {number} nativeAmount - how many satoshis to spend
  */
-function createSpendRequest (wallet, toAddress, nativeAmount, options) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({
-    func: 'createSpendRequest',
-    wallet,
-    toAddress,
-    nativeAmount,
-    options
-  })
+function requestSpend(wallet, toAddress, nativeAmount, options) {
+  return postWrapper({
+    func: 'requestSpend',
+    wallet: wallet,
+    toAddress: toAddress,
+    nativeAmount: nativeAmount,
+    options: options
+  });
 }
 
 /**
@@ -476,16 +435,16 @@ function createSpendRequest (wallet, toAddress, nativeAmount, options) {
  * @param {string} toAddress2 - the recipient address
  * @param {number} nativeAmount2 - how many satoshis to spend
  */
-function createSpendRequest2 (wallet, toAddress, nativeAmount, toAddress2, nativeAmount2, options) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({
+function createSpendRequest2(wallet, toAddress, nativeAmount, toAddress2, nativeAmount2, options) {
+  return postWrapper({
     func: 'createSpendRequest2',
-    wallet,
-    toAddress,
-    nativeAmount,
-    toAddress2,
-    nativeAmount2,
-    options
-  })
+    wallet: wallet,
+    toAddress: toAddress,
+    nativeAmount: nativeAmount,
+    toAddress2: toAddress2,
+    nativeAmount2: nativeAmount2,
+    options: options
+  });
 }
 
 /**
@@ -495,24 +454,24 @@ function createSpendRequest2 (wallet, toAddress, nativeAmount, toAddress2, nativ
  * @param {number} nativeAmount - how many satoshis to spend
  * @param {amountFiat} amountFiat - not required, but the fiat value at the time of the request
  */
-function requestSign (wallet, toAddress, nativeAmount, amountFiat, options) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({
+function requestSign(wallet, toAddress, nativeAmount, amountFiat, options) {
+  return postWrapper({
     func: 'requestSign',
-    wallet,
-    toAddress,
-    nativeAmount,
-    amountFiat,
-    options
-  })
+    wallet: wallet,
+    toAddress: toAddress,
+    nativeAmount: nativeAmount,
+    amountFiat: amountFiat,
+    options: options
+  });
 }
 
 /**
- * Broadcast a transaction to the bitcoin network.
+ * Broadcast a transaction.
  * @param {object} the wallet object
  * @param {string} the raw hex to be saved to the database
  */
-function broadcastTx (wallet, rawtx) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'broadcastTx', wallet, rawtx})
+function broadcastTx(wallet, rawtx) {
+  return postWrapper({ func: 'broadcastTx', wallet: wallet, rawtx: rawtx });
 }
 
 /**
@@ -522,16 +481,16 @@ function broadcastTx (wallet, rawtx) {
  * @param {object} the wallet object
  * @param {string} the raw hex to be saved to the database
  */
-function saveTx (wallet, rawtx) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'saveTx', wallet, rawtx})
+function saveTx(wallet, rawtx) {
+  return postWrapper({ func: 'saveTx', wallet: wallet, rawtx: rawtx });
 }
 
 /**
  * Launches the native OS's camera or file browser so the user can select a
- * file. The options.success callback will be triggered when complete.
+ * file.
  */
-function requestFile (options) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'requestFile', options: options})
+function requestFile(options) {
+  return postWrapper({ func: 'requestFile', options: options });
 }
 
 /**
@@ -540,44 +499,31 @@ function requestFile (options) {
  * @param {string} key - the key to access the data in the future
  * @param {object} data - the data to write, which will be encrypted and backed up
  */
-function writeData (key, value) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'writeData', key, value})
+function writeData(key, value) {
+  return postWrapper({ func: 'writeData', key: key, value: value });
 }
 
 /**
  * Clear all data in the Airbitz core, for the current plugin.
  */
-function clearData () {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'clearData'})
+function clearData() {
+  return postWrapper({ func: 'clearData' });
 }
 
 /**
  * Read the securely stored data from disk.
  * @param {string} key - the key to access the data.
  */
-function readData (key) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'readData', key})
-}
-
-/**
- * Formats currencies to display to the user. This uses the user's BTC
- * denomination to format including the correct code and symbol.
- * @param {number} currency - the satoshi value to format
- * @param {boolean} withSymbol - whether to include a currency symbol when formatting
- * @return {string} the formatted satoshi value in either BTC, mBTC or bits.
- */
-function formatCurrency (currency, currencyNum, withSymbol) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({
-    func: 'formatCurrency', currency, currencyNum, withSymbol
-  })
+function readData(key) {
+  return postWrapper({ func: 'readData', key: key });
 }
 
 /**
  * Log messages to the ABC core at a particular level.
  * @param {number} level - ERROR = 0, WARNING = 1, INFO = 2, DEBUG = 3;
  */
-function debugLevel (level, text) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'debugLevel', level, text})
+function debugLevel(level, text) {
+  return postWrapper({ func: 'debugLevel', level: level, text: text });
 }
 
 /**
@@ -585,20 +531,30 @@ function debugLevel (level, text) {
  * link.
  * @return {object} dictionary of affiliate data
  */
-function getAffiliateInfo () {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'getAffiliateInfo'})
+function getAffiliateInfo() {
+  return postWrapper({ func: 'getAffiliateInfo' });
 }
 
-
-/***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (immutable) */ __webpack_exports__["get"] = get;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__bridge_js__ = __webpack_require__(0);
-
+var core = /*#__PURE__*/Object.freeze({
+  bitidAddress: bitidAddress,
+  bitidSignature: bitidSignature,
+  chooseWallet: chooseWallet,
+  selectedWallet: selectedWallet,
+  wallets: wallets,
+  getAddress: getAddress,
+  finalizeReceiveRequest: finalizeReceiveRequest,
+  requestSpend: requestSpend,
+  createSpendRequest2: createSpendRequest2,
+  requestSign: requestSign,
+  broadcastTx: broadcastTx,
+  saveTx: saveTx,
+  requestFile: requestFile,
+  writeData: writeData,
+  clearData: clearData,
+  readData: readData,
+  debugLevel: debugLevel,
+  getAffiliateInfo: getAffiliateInfo
+});
 
 /**
  * Fetch a configuration value. These are set in the native code, before the
@@ -606,365 +562,110 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  * @param {key} key - the configuration key to fetch a value for
  * @return Promise with either string value on success or err on failure
  */
-function get (key) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'get', key})
+function get(key) {
+  return postWrapper({ func: 'get', key: key });
 }
 
-
-/***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (immutable) */ __webpack_exports__["showAlert"] = showAlert;
-/* harmony export (immutable) */ __webpack_exports__["hideAlert"] = hideAlert;
-/* harmony export (immutable) */ __webpack_exports__["title"] = title;
-/* harmony export (immutable) */ __webpack_exports__["back"] = back;
-/* harmony export (immutable) */ __webpack_exports__["exit"] = exit;
-/* harmony export (immutable) */ __webpack_exports__["launchExternal"] = launchExternal;
-/* harmony export (immutable) */ __webpack_exports__["navStackClear"] = navStackClear;
-/* harmony export (immutable) */ __webpack_exports__["navStackPush"] = navStackPush;
-/* harmony export (immutable) */ __webpack_exports__["navStackPop"] = navStackPop;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__bridge_js__ = __webpack_require__(0);
-
+var config = /*#__PURE__*/Object.freeze({
+  get: get
+});
 
 /**
  * Launches a native alert dialog.
  * @param {string} title - the dialog title
  * @param {string} message - the message body of the dialog
  */
-function showAlert (success, title, message, options) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'showAlert', success, title, message})
+function showAlert(success, title, message, options) {
+  return postWrapper({ func: 'showAlert', success: success, title: title, message: message });
 }
 
 /**
  * Hide an alerts that are currently displayed.
  */
-function hideAlert () {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'hideAlert'})
+function hideAlert() {
+  return postWrapper({ func: 'hideAlert' });
 }
 
 /**
  * Set the title of the current view. This updates the native apps titlebar.
  * @param {string} title - the title string
  */
-function title (s) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'title', 'title': s})
+function title(s) {
+  return postWrapper({ func: 'title', 'title': s });
 }
 
 /**
  * Go back in the navigation stack.
  */
-function back () {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'back'})
+function back() {
+  return postWrapper({ func: 'back' });
 }
 
 /**
  * Exit the plugin. This pops the current fragment or view controller of the
  * stack and destroys the webview.
  */
-function exit () {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'exit'})
+function exit() {
+  return postWrapper({ func: 'exit' });
 }
 
 /**
  * Launch an external web page or application.
  * @param {string} uri - the uri or url to open in a different app.
  */
-function launchExternal (uri) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'launchExternal', uri})
+function launchExternal(uri) {
+  return postWrapper({ func: 'launchExternal', uri: uri });
 }
 
 /**
  * Clear the naviation stack. Helpful when overriding the behavior of the
  * back button.
  */
-function navStackClear () {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'navStackClear'})
+function navStackClear() {
+  return postWrapper({ func: 'navStackClear' });
 }
 
 /**
  * Push a new URL onto the nav stack.
  */
-function navStackPush (path) {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'navStackPush', path})
+function navStackPush(path) {
+  return postWrapper({ func: 'navStackPush', path: path });
 }
 
 /**
  * Pop a URL off the nav stack.
  */
-function navStackPop () {
-  return Object(__WEBPACK_IMPORTED_MODULE_0__bridge_js__["a" /* postWrapper */])({func: 'navStackPop'})
+function navStackPop() {
+  return postWrapper({ func: 'navStackPop' });
 }
 
+var ui = /*#__PURE__*/Object.freeze({
+  showAlert: showAlert,
+  hideAlert: hideAlert,
+  title: title,
+  back: back,
+  exit: exit,
+  launchExternal: launchExternal,
+  navStackClear: navStackClear,
+  navStackPush: navStackPush,
+  navStackPop: navStackPop
+});
 
-/***/ }),
-/* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+var COUNTRY_LIST = [{ 'name': 'Afghanistan', 'codeAlpha3': 'AFG', 'country-code': '004' }, { 'name': 'Åland Islands', 'codeAlpha3': 'ALA', 'country-code': '248' }, { 'name': 'Albania', 'codeAlpha3': 'ALB', 'country-code': '008' }, { 'name': 'Algeria', 'codeAlpha3': 'DZA', 'country-code': '012' }, { 'name': 'American Samoa', 'codeAlpha3': 'ASM', 'country-code': '016' }, { 'name': 'Andorra', 'codeAlpha3': 'AND', 'country-code': '020' }, { 'name': 'Angola', 'codeAlpha3': 'AGO', 'country-code': '024' }, { 'name': 'Anguilla', 'codeAlpha3': 'AIA', 'country-code': '660' }, { 'name': 'Antarctica', 'codeAlpha3': 'ATA', 'country-code': '010' }, { 'name': 'Antigua and Barbuda', 'codeAlpha3': 'ATG', 'country-code': '028' }, { 'name': 'Argentina', 'codeAlpha3': 'ARG', 'country-code': '032' }, { 'name': 'Armenia', 'codeAlpha3': 'ARM', 'country-code': '051' }, { 'name': 'Aruba', 'codeAlpha3': 'ABW', 'country-code': '533' }, { 'name': 'Australia', 'codeAlpha3': 'AUS', 'country-code': '036' }, { 'name': 'Austria', 'codeAlpha3': 'AUT', 'country-code': '040' }, { 'name': 'Azerbaijan', 'codeAlpha3': 'AZE', 'country-code': '031' }, { 'name': 'Bahamas', 'codeAlpha3': 'BHS', 'country-code': '044' }, { 'name': 'Bahrain', 'codeAlpha3': 'BHR', 'country-code': '048' }, { 'name': 'Bangladesh', 'codeAlpha3': 'BGD', 'country-code': '050' }, { 'name': 'Barbados', 'codeAlpha3': 'BRB', 'country-code': '052' }, { 'name': 'Belarus', 'codeAlpha3': 'BLR', 'country-code': '112' }, { 'name': 'Belgium', 'codeAlpha3': 'BEL', 'country-code': '056' }, { 'name': 'Belize', 'codeAlpha3': 'BLZ', 'country-code': '084' }, { 'name': 'Benin', 'codeAlpha3': 'BEN', 'country-code': '204' }, { 'name': 'Bermuda', 'codeAlpha3': 'BMU', 'country-code': '060' }, { 'name': 'Bhutan', 'codeAlpha3': 'BTN', 'country-code': '064' }, { 'name': 'Bolivia (Plurinational State of)', 'codeAlpha3': 'BOL', 'country-code': '068' }, { 'name': 'Bonaire, Sint Eustatius and Saba', 'codeAlpha3': 'BES', 'country-code': '535' }, { 'name': 'Bosnia and Herzegovina', 'codeAlpha3': 'BIH', 'country-code': '070' }, { 'name': 'Botswana', 'codeAlpha3': 'BWA', 'country-code': '072' }, { 'name': 'Bouvet Island', 'codeAlpha3': 'BVT', 'country-code': '074' }, { 'name': 'Brazil', 'codeAlpha3': 'BRA', 'country-code': '076' }, { 'name': 'British Indian Ocean Territory', 'codeAlpha3': 'IOT', 'country-code': '086' }, { 'name': 'Brunei Darussalam', 'codeAlpha3': 'BRN', 'country-code': '096' }, { 'name': 'Bulgaria', 'codeAlpha3': 'BGR', 'country-code': '100' }, { 'name': 'Burkina Faso', 'codeAlpha3': 'BFA', 'country-code': '854' }, { 'name': 'Burundi', 'codeAlpha3': 'BDI', 'country-code': '108' }, { 'name': 'Cambodia', 'codeAlpha3': 'KHM', 'country-code': '116' }, { 'name': 'Cameroon', 'codeAlpha3': 'CMR', 'country-code': '120' }, { 'name': 'Canada', 'codeAlpha3': 'CAN', 'country-code': '124' }, { 'name': 'Cabo Verde', 'codeAlpha3': 'CPV', 'country-code': '132' }, { 'name': 'Cayman Islands', 'codeAlpha3': 'CYM', 'country-code': '136' }, { 'name': 'Central African Republic', 'codeAlpha3': 'CAF', 'country-code': '140' }, { 'name': 'Chad', 'codeAlpha3': 'TCD', 'country-code': '148' }, { 'name': 'Chile', 'codeAlpha3': 'CHL', 'country-code': '152' }, { 'name': 'China', 'codeAlpha3': 'CHN', 'country-code': '156' }, { 'name': 'Christmas Island', 'codeAlpha3': 'CXR', 'country-code': '162' }, { 'name': 'Cocos (Keeling) Islands', 'codeAlpha3': 'CCK', 'country-code': '166' }, { 'name': 'Colombia', 'codeAlpha3': 'COL', 'country-code': '170' }, { 'name': 'Comoros', 'codeAlpha3': 'COM', 'country-code': '174' }, { 'name': 'Congo', 'codeAlpha3': 'COG', 'country-code': '178' }, { 'name': 'Congo (Democratic Republic of the)', 'codeAlpha3': 'COD', 'country-code': '180' }, { 'name': 'Cook Islands', 'codeAlpha3': 'COK', 'country-code': '184' }, { 'name': 'Costa Rica', 'codeAlpha3': 'CRI', 'country-code': '188' }, { 'name': "Côte d'Ivoire", 'codeAlpha3': 'CIV', 'country-code': '384' }, { 'name': 'Croatia', 'codeAlpha3': 'HRV', 'country-code': '191' }, { 'name': 'Cuba', 'codeAlpha3': 'CUB', 'country-code': '192' }, { 'name': 'Curaçao', 'codeAlpha3': 'CUW', 'country-code': '531' }, { 'name': 'Cyprus', 'codeAlpha3': 'CYP', 'country-code': '196' }, { 'name': 'Czech Republic', 'codeAlpha3': 'CZE', 'country-code': '203' }, { 'name': 'Denmark', 'codeAlpha3': 'DNK', 'country-code': '208' }, { 'name': 'Djibouti', 'codeAlpha3': 'DJI', 'country-code': '262' }, { 'name': 'Dominica', 'codeAlpha3': 'DMA', 'country-code': '212' }, { 'name': 'Dominican Republic', 'codeAlpha3': 'DOM', 'country-code': '214' }, { 'name': 'Ecuador', 'codeAlpha3': 'ECU', 'country-code': '218' }, { 'name': 'Egypt', 'codeAlpha3': 'EGY', 'country-code': '818' }, { 'name': 'El Salvador', 'codeAlpha3': 'SLV', 'country-code': '222' }, { 'name': 'Equatorial Guinea', 'codeAlpha3': 'GNQ', 'country-code': '226' }, { 'name': 'Eritrea', 'codeAlpha3': 'ERI', 'country-code': '232' }, { 'name': 'Estonia', 'codeAlpha3': 'EST', 'country-code': '233' }, { 'name': 'Ethiopia', 'codeAlpha3': 'ETH', 'country-code': '231' }, { 'name': 'Falkland Islands (Malvinas)', 'codeAlpha3': 'FLK', 'country-code': '238' }, { 'name': 'Faroe Islands', 'codeAlpha3': 'FRO', 'country-code': '234' }, { 'name': 'Fiji', 'codeAlpha3': 'FJI', 'country-code': '242' }, { 'name': 'Finland', 'codeAlpha3': 'FIN', 'country-code': '246' }, { 'name': 'France', 'codeAlpha3': 'FRA', 'country-code': '250' }, { 'name': 'French Guiana', 'codeAlpha3': 'GUF', 'country-code': '254' }, { 'name': 'French Polynesia', 'codeAlpha3': 'PYF', 'country-code': '258' }, { 'name': 'French Southern Territories', 'codeAlpha3': 'ATF', 'country-code': '260' }, { 'name': 'Gabon', 'codeAlpha3': 'GAB', 'country-code': '266' }, { 'name': 'Gambia', 'codeAlpha3': 'GMB', 'country-code': '270' }, { 'name': 'Georgia', 'codeAlpha3': 'GEO', 'country-code': '268' }, { 'name': 'Germany', 'codeAlpha3': 'DEU', 'country-code': '276' }, { 'name': 'Ghana', 'codeAlpha3': 'GHA', 'country-code': '288' }, { 'name': 'Gibraltar', 'codeAlpha3': 'GIB', 'country-code': '292' }, { 'name': 'Greece', 'codeAlpha3': 'GRC', 'country-code': '300' }, { 'name': 'Greenland', 'codeAlpha3': 'GRL', 'country-code': '304' }, { 'name': 'Grenada', 'codeAlpha3': 'GRD', 'country-code': '308' }, { 'name': 'Guadeloupe', 'codeAlpha3': 'GLP', 'country-code': '312' }, { 'name': 'Guam', 'codeAlpha3': 'GUM', 'country-code': '316' }, { 'name': 'Guatemala', 'codeAlpha3': 'GTM', 'country-code': '320' }, { 'name': 'Guernsey', 'codeAlpha3': 'GGY', 'country-code': '831' }, { 'name': 'Guinea', 'codeAlpha3': 'GIN', 'country-code': '324' }, { 'name': 'Guinea-Bissau', 'codeAlpha3': 'GNB', 'country-code': '624' }, { 'name': 'Guyana', 'codeAlpha3': 'GUY', 'country-code': '328' }, { 'name': 'Haiti', 'codeAlpha3': 'HTI', 'country-code': '332' }, { 'name': 'Heard Island and McDonald Islands', 'codeAlpha3': 'HMD', 'country-code': '334' }, { 'name': 'Holy See', 'codeAlpha3': 'VAT', 'country-code': '336' }, { 'name': 'Honduras', 'codeAlpha3': 'HND', 'country-code': '340' }, { 'name': 'Hong Kong', 'codeAlpha3': 'HKG', 'country-code': '344' }, { 'name': 'Hungary', 'codeAlpha3': 'HUN', 'country-code': '348' }, { 'name': 'Iceland', 'codeAlpha3': 'ISL', 'country-code': '352' }, { 'name': 'India', 'codeAlpha3': 'IND', 'country-code': '356' }, { 'name': 'Indonesia', 'codeAlpha3': 'IDN', 'country-code': '360' }, { 'name': 'Iran (Islamic Republic of)', 'codeAlpha3': 'IRN', 'country-code': '364' }, { 'name': 'Iraq', 'codeAlpha3': 'IRQ', 'country-code': '368' }, { 'name': 'Ireland', 'codeAlpha3': 'IRL', 'country-code': '372' }, { 'name': 'Isle of Man', 'codeAlpha3': 'IMN', 'country-code': '833' }, { 'name': 'Israel', 'codeAlpha3': 'ISR', 'country-code': '376' }, { 'name': 'Italy', 'codeAlpha3': 'ITA', 'country-code': '380' }, { 'name': 'Jamaica', 'codeAlpha3': 'JAM', 'country-code': '388' }, { 'name': 'Japan', 'codeAlpha3': 'JPN', 'country-code': '392' }, { 'name': 'Jersey', 'codeAlpha3': 'JEY', 'country-code': '832' }, { 'name': 'Jordan', 'codeAlpha3': 'JOR', 'country-code': '400' }, { 'name': 'Kazakhstan', 'codeAlpha3': 'KAZ', 'country-code': '398' }, { 'name': 'Kenya', 'codeAlpha3': 'KEN', 'country-code': '404' }, { 'name': 'Kiribati', 'codeAlpha3': 'KIR', 'country-code': '296' }, { 'name': "Korea (Democratic People's Republic of)", 'codeAlpha3': 'PRK', 'country-code': '408' }, { 'name': 'Korea (Republic of)', 'codeAlpha3': 'KOR', 'country-code': '410' }, { 'name': 'Kuwait', 'codeAlpha3': 'KWT', 'country-code': '414' }, { 'name': 'Kyrgyzstan', 'codeAlpha3': 'KGZ', 'country-code': '417' }, { 'name': "Lao People's Democratic Republic", 'codeAlpha3': 'LAO', 'country-code': '418' }, { 'name': 'Latvia', 'codeAlpha3': 'LVA', 'country-code': '428' }, { 'name': 'Lebanon', 'codeAlpha3': 'LBN', 'country-code': '422' }, { 'name': 'Lesotho', 'codeAlpha3': 'LSO', 'country-code': '426' }, { 'name': 'Liberia', 'codeAlpha3': 'LBR', 'country-code': '430' }, { 'name': 'Libya', 'codeAlpha3': 'LBY', 'country-code': '434' }, { 'name': 'Liechtenstein', 'codeAlpha3': 'LIE', 'country-code': '438' }, { 'name': 'Lithuania', 'codeAlpha3': 'LTU', 'country-code': '440' }, { 'name': 'Luxembourg', 'codeAlpha3': 'LUX', 'country-code': '442' }, { 'name': 'Macao', 'codeAlpha3': 'MAC', 'country-code': '446' }, { 'name': 'Macedonia (the former Yugoslav Republic of)', 'codeAlpha3': 'MKD', 'country-code': '807' }, { 'name': 'Madagascar', 'codeAlpha3': 'MDG', 'country-code': '450' }, { 'name': 'Malawi', 'codeAlpha3': 'MWI', 'country-code': '454' }, { 'name': 'Malaysia', 'codeAlpha3': 'MYS', 'country-code': '458' }, { 'name': 'Maldives', 'codeAlpha3': 'MDV', 'country-code': '462' }, { 'name': 'Mali', 'codeAlpha3': 'MLI', 'country-code': '466' }, { 'name': 'Malta', 'codeAlpha3': 'MLT', 'country-code': '470' }, { 'name': 'Marshall Islands', 'codeAlpha3': 'MHL', 'country-code': '584' }, { 'name': 'Martinique', 'codeAlpha3': 'MTQ', 'country-code': '474' }, { 'name': 'Mauritania', 'codeAlpha3': 'MRT', 'country-code': '478' }, { 'name': 'Mauritius', 'codeAlpha3': 'MUS', 'country-code': '480' }, { 'name': 'Mayotte', 'codeAlpha3': 'MYT', 'country-code': '175' }, { 'name': 'Mexico', 'codeAlpha3': 'MEX', 'country-code': '484' }, { 'name': 'Micronesia (Federated States of)', 'codeAlpha3': 'FSM', 'country-code': '583' }, { 'name': 'Moldova (Republic of)', 'codeAlpha3': 'MDA', 'country-code': '498' }, { 'name': 'Monaco', 'codeAlpha3': 'MCO', 'country-code': '492' }, { 'name': 'Mongolia', 'codeAlpha3': 'MNG', 'country-code': '496' }, { 'name': 'Montenegro', 'codeAlpha3': 'MNE', 'country-code': '499' }, { 'name': 'Montserrat', 'codeAlpha3': 'MSR', 'country-code': '500' }, { 'name': 'Morocco', 'codeAlpha3': 'MAR', 'country-code': '504' }, { 'name': 'Mozambique', 'codeAlpha3': 'MOZ', 'country-code': '508' }, { 'name': 'Myanmar', 'codeAlpha3': 'MMR', 'country-code': '104' }, { 'name': 'Namibia', 'codeAlpha3': 'NAM', 'country-code': '516' }, { 'name': 'Nauru', 'codeAlpha3': 'NRU', 'country-code': '520' }, { 'name': 'Nepal', 'codeAlpha3': 'NPL', 'country-code': '524' }, { 'name': 'Netherlands', 'codeAlpha3': 'NLD', 'country-code': '528' }, { 'name': 'New Caledonia', 'codeAlpha3': 'NCL', 'country-code': '540' }, { 'name': 'New Zealand', 'codeAlpha3': 'NZL', 'country-code': '554' }, { 'name': 'Nicaragua', 'codeAlpha3': 'NIC', 'country-code': '558' }, { 'name': 'Niger', 'codeAlpha3': 'NER', 'country-code': '562' }, { 'name': 'Nigeria', 'codeAlpha3': 'NGA', 'country-code': '566' }, { 'name': 'Niue', 'codeAlpha3': 'NIU', 'country-code': '570' }, { 'name': 'Norfolk Island', 'codeAlpha3': 'NFK', 'country-code': '574' }, { 'name': 'Northern Mariana Islands', 'codeAlpha3': 'MNP', 'country-code': '580' }, { 'name': 'Norway', 'codeAlpha3': 'NOR', 'country-code': '578' }, { 'name': 'Oman', 'codeAlpha3': 'OMN', 'country-code': '512' }, { 'name': 'Pakistan', 'codeAlpha3': 'PAK', 'country-code': '586' }, { 'name': 'Palau', 'codeAlpha3': 'PLW', 'country-code': '585' }, { 'name': 'Palestine, State of', 'codeAlpha3': 'PSE', 'country-code': '275' }, { 'name': 'Panama', 'codeAlpha3': 'PAN', 'country-code': '591' }, { 'name': 'Papua New Guinea', 'codeAlpha3': 'PNG', 'country-code': '598' }, { 'name': 'Paraguay', 'codeAlpha3': 'PRY', 'country-code': '600' }, { 'name': 'Peru', 'codeAlpha3': 'PER', 'country-code': '604' }, { 'name': 'Philippines', 'codeAlpha3': 'PHL', 'country-code': '608' }, { 'name': 'Pitcairn', 'codeAlpha3': 'PCN', 'country-code': '612' }, { 'name': 'Poland', 'codeAlpha3': 'POL', 'country-code': '616' }, { 'name': 'Portugal', 'codeAlpha3': 'PRT', 'country-code': '620' }, { 'name': 'Puerto Rico', 'codeAlpha3': 'PRI', 'country-code': '630' }, { 'name': 'Qatar', 'codeAlpha3': 'QAT', 'country-code': '634' }, { 'name': 'Réunion', 'codeAlpha3': 'REU', 'country-code': '638' }, { 'name': 'Romania', 'codeAlpha3': 'ROU', 'country-code': '642' }, { 'name': 'Russian Federation', 'codeAlpha3': 'RUS', 'country-code': '643' }, { 'name': 'Rwanda', 'codeAlpha3': 'RWA', 'country-code': '646' }, { 'name': 'Saint Barthélemy', 'codeAlpha3': 'BLM', 'country-code': '652' }, { 'name': 'Saint Helena, Ascension and Tristan da Cunha', 'codeAlpha3': 'SHN', 'country-code': '654' }, { 'name': 'Saint Kitts and Nevis', 'codeAlpha3': 'KNA', 'country-code': '659' }, { 'name': 'Saint Lucia', 'codeAlpha3': 'LCA', 'country-code': '662' }, { 'name': 'Saint Martin (French part)', 'codeAlpha3': 'MAF', 'country-code': '663' }, { 'name': 'Saint Pierre and Miquelon', 'codeAlpha3': 'SPM', 'country-code': '666' }, { 'name': 'Saint Vincent and the Grenadines', 'codeAlpha3': 'VCT', 'country-code': '670' }, { 'name': 'Samoa', 'codeAlpha3': 'WSM', 'country-code': '882' }, { 'name': 'San Marino', 'codeAlpha3': 'SMR', 'country-code': '674' }, { 'name': 'Sao Tome and Principe', 'codeAlpha3': 'STP', 'country-code': '678' }, { 'name': 'Saudi Arabia', 'codeAlpha3': 'SAU', 'country-code': '682' }, { 'name': 'Senegal', 'codeAlpha3': 'SEN', 'country-code': '686' }, { 'name': 'Serbia', 'codeAlpha3': 'SRB', 'country-code': '688' }, { 'name': 'Seychelles', 'codeAlpha3': 'SYC', 'country-code': '690' }, { 'name': 'Sierra Leone', 'codeAlpha3': 'SLE', 'country-code': '694' }, { 'name': 'Singapore', 'codeAlpha3': 'SGP', 'country-code': '702' }, { 'name': 'Sint Maarten (Dutch part)', 'codeAlpha3': 'SXM', 'country-code': '534' }, { 'name': 'Slovakia', 'codeAlpha3': 'SVK', 'country-code': '703' }, { 'name': 'Slovenia', 'codeAlpha3': 'SVN', 'country-code': '705' }, { 'name': 'Solomon Islands', 'codeAlpha3': 'SLB', 'country-code': '090' }, { 'name': 'Somalia', 'codeAlpha3': 'SOM', 'country-code': '706' }, { 'name': 'South Africa', 'codeAlpha3': 'ZAF', 'country-code': '710' }, { 'name': 'South Georgia and the South Sandwich Islands', 'codeAlpha3': 'SGS', 'country-code': '239' }, { 'name': 'South Sudan', 'codeAlpha3': 'SSD', 'country-code': '728' }, { 'name': 'Spain', 'codeAlpha3': 'ESP', 'country-code': '724' }, { 'name': 'Sri Lanka', 'codeAlpha3': 'LKA', 'country-code': '144' }, { 'name': 'Sudan', 'codeAlpha3': 'SDN', 'country-code': '729' }, { 'name': 'Suriname', 'codeAlpha3': 'SUR', 'country-code': '740' }, { 'name': 'Svalbard and Jan Mayen', 'codeAlpha3': 'SJM', 'country-code': '744' }, { 'name': 'Swaziland', 'codeAlpha3': 'SWZ', 'country-code': '748' }, { 'name': 'Sweden', 'codeAlpha3': 'SWE', 'country-code': '752' }, { 'name': 'Switzerland', 'codeAlpha3': 'CHE', 'country-code': '756' }, { 'name': 'Syrian Arab Republic', 'codeAlpha3': 'SYR', 'country-code': '760' }, { 'name': 'Taiwan, Province of China', 'codeAlpha3': 'TWN', 'country-code': '158' }, { 'name': 'Tajikistan', 'codeAlpha3': 'TJK', 'country-code': '762' }, { 'name': 'Tanzania, United Republic of', 'codeAlpha3': 'TZA', 'country-code': '834' }, { 'name': 'Thailand', 'codeAlpha3': 'THA', 'country-code': '764' }, { 'name': 'Timor-Leste', 'codeAlpha3': 'TLS', 'country-code': '626' }, { 'name': 'Togo', 'codeAlpha3': 'TGO', 'country-code': '768' }, { 'name': 'Tokelau', 'codeAlpha3': 'TKL', 'country-code': '772' }, { 'name': 'Tonga', 'codeAlpha3': 'TON', 'country-code': '776' }, { 'name': 'Trinidad and Tobago', 'codeAlpha3': 'TTO', 'country-code': '780' }, { 'name': 'Tunisia', 'codeAlpha3': 'TUN', 'country-code': '788' }, { 'name': 'Turkey', 'codeAlpha3': 'TUR', 'country-code': '792' }, { 'name': 'Turkmenistan', 'codeAlpha3': 'TKM', 'country-code': '795' }, { 'name': 'Turks and Caicos Islands', 'codeAlpha3': 'TCA', 'country-code': '796' }, { 'name': 'Tuvalu', 'codeAlpha3': 'TUV', 'country-code': '798' }, { 'name': 'Uganda', 'codeAlpha3': 'UGA', 'country-code': '800' }, { 'name': 'Ukraine', 'codeAlpha3': 'UKR', 'country-code': '804' }, { 'name': 'United Arab Emirates', 'codeAlpha3': 'ARE', 'country-code': '784' }, { 'name': 'United Kingdom of Great Britain and Northern Ireland', 'codeAlpha3': 'GBR', 'country-code': '826' }, { 'name': 'United States of America', 'codeAlpha3': 'USA', 'country-code': '840' }, { 'name': 'United States Minor Outlying Islands', 'codeAlpha3': 'UMI', 'country-code': '581' }, { 'name': 'Uruguay', 'codeAlpha3': 'URY', 'country-code': '858' }, { 'name': 'Uzbekistan', 'codeAlpha3': 'UZB', 'country-code': '860' }, { 'name': 'Vanuatu', 'codeAlpha3': 'VUT', 'country-code': '548' }, { 'name': 'Venezuela (Bolivarian Republic of)', 'codeAlpha3': 'VEN', 'country-code': '862' }, { 'name': 'Viet Nam', 'codeAlpha3': 'VNM', 'country-code': '704' }, { 'name': 'Virgin Islands (British)', 'codeAlpha3': 'VGB', 'country-code': '092' }, { 'name': 'Virgin Islands (U.S.)', 'codeAlpha3': 'VIR', 'country-code': '850' }, { 'name': 'Wallis and Futuna', 'codeAlpha3': 'WLF', 'country-code': '876' }, { 'name': 'Western Sahara', 'codeAlpha3': 'ESH', 'country-code': '732' }, { 'name': 'Yemen', 'codeAlpha3': 'YEM', 'country-code': '887' }, { 'name': 'Zambia', 'codeAlpha3': 'ZMB', 'country-code': '894' }, { 'name': 'Zimbabwe', 'codeAlpha3': 'ZWE', 'country-code': '716' }];
 
-"use strict";
-const COUNTRY_LIST = [
-  {'name': 'Afghanistan', 'codeAlpha3': 'AFG', 'country-code': '004'},
-  {'name': 'Åland Islands', 'codeAlpha3': 'ALA', 'country-code': '248'},
-  {'name': 'Albania', 'codeAlpha3': 'ALB', 'country-code': '008'},
-  {'name': 'Algeria', 'codeAlpha3': 'DZA', 'country-code': '012'},
-  {'name': 'American Samoa', 'codeAlpha3': 'ASM', 'country-code': '016'},
-  {'name': 'Andorra', 'codeAlpha3': 'AND', 'country-code': '020'},
-  {'name': 'Angola', 'codeAlpha3': 'AGO', 'country-code': '024'},
-  {'name': 'Anguilla', 'codeAlpha3': 'AIA', 'country-code': '660'},
-  {'name': 'Antarctica', 'codeAlpha3': 'ATA', 'country-code': '010'},
-  {'name': 'Antigua and Barbuda', 'codeAlpha3': 'ATG', 'country-code': '028'},
-  {'name': 'Argentina', 'codeAlpha3': 'ARG', 'country-code': '032'},
-  {'name': 'Armenia', 'codeAlpha3': 'ARM', 'country-code': '051'},
-  {'name': 'Aruba', 'codeAlpha3': 'ABW', 'country-code': '533'},
-  {'name': 'Australia', 'codeAlpha3': 'AUS', 'country-code': '036'},
-  {'name': 'Austria', 'codeAlpha3': 'AUT', 'country-code': '040'},
-  {'name': 'Azerbaijan', 'codeAlpha3': 'AZE', 'country-code': '031'},
-  {'name': 'Bahamas', 'codeAlpha3': 'BHS', 'country-code': '044'},
-  {'name': 'Bahrain', 'codeAlpha3': 'BHR', 'country-code': '048'},
-  {'name': 'Bangladesh', 'codeAlpha3': 'BGD', 'country-code': '050'},
-  {'name': 'Barbados', 'codeAlpha3': 'BRB', 'country-code': '052'},
-  {'name': 'Belarus', 'codeAlpha3': 'BLR', 'country-code': '112'},
-  {'name': 'Belgium', 'codeAlpha3': 'BEL', 'country-code': '056'},
-  {'name': 'Belize', 'codeAlpha3': 'BLZ', 'country-code': '084'},
-  {'name': 'Benin', 'codeAlpha3': 'BEN', 'country-code': '204'},
-  {'name': 'Bermuda', 'codeAlpha3': 'BMU', 'country-code': '060'},
-  {'name': 'Bhutan', 'codeAlpha3': 'BTN', 'country-code': '064'},
-  {'name': 'Bolivia (Plurinational State of)', 'codeAlpha3': 'BOL', 'country-code': '068'},
-  {'name': 'Bonaire, Sint Eustatius and Saba', 'codeAlpha3': 'BES', 'country-code': '535'},
-  {'name': 'Bosnia and Herzegovina', 'codeAlpha3': 'BIH', 'country-code': '070'},
-  {'name': 'Botswana', 'codeAlpha3': 'BWA', 'country-code': '072'},
-  {'name': 'Bouvet Island', 'codeAlpha3': 'BVT', 'country-code': '074'},
-  {'name': 'Brazil', 'codeAlpha3': 'BRA', 'country-code': '076'},
-  {'name': 'British Indian Ocean Territory', 'codeAlpha3': 'IOT', 'country-code': '086'},
-  {'name': 'Brunei Darussalam', 'codeAlpha3': 'BRN', 'country-code': '096'},
-  {'name': 'Bulgaria', 'codeAlpha3': 'BGR', 'country-code': '100'},
-  {'name': 'Burkina Faso', 'codeAlpha3': 'BFA', 'country-code': '854'},
-  {'name': 'Burundi', 'codeAlpha3': 'BDI', 'country-code': '108'},
-  {'name': 'Cambodia', 'codeAlpha3': 'KHM', 'country-code': '116'},
-  {'name': 'Cameroon', 'codeAlpha3': 'CMR', 'country-code': '120'},
-  {'name': 'Canada', 'codeAlpha3': 'CAN', 'country-code': '124'},
-  {'name': 'Cabo Verde', 'codeAlpha3': 'CPV', 'country-code': '132'},
-  {'name': 'Cayman Islands', 'codeAlpha3': 'CYM', 'country-code': '136'},
-  {'name': 'Central African Republic', 'codeAlpha3': 'CAF', 'country-code': '140'},
-  {'name': 'Chad', 'codeAlpha3': 'TCD', 'country-code': '148'},
-  {'name': 'Chile', 'codeAlpha3': 'CHL', 'country-code': '152'},
-  {'name': 'China', 'codeAlpha3': 'CHN', 'country-code': '156'},
-  {'name': 'Christmas Island', 'codeAlpha3': 'CXR', 'country-code': '162'},
-  {'name': 'Cocos (Keeling) Islands', 'codeAlpha3': 'CCK', 'country-code': '166'},
-  {'name': 'Colombia', 'codeAlpha3': 'COL', 'country-code': '170'},
-  {'name': 'Comoros', 'codeAlpha3': 'COM', 'country-code': '174'},
-  {'name': 'Congo', 'codeAlpha3': 'COG', 'country-code': '178'},
-  {'name': 'Congo (Democratic Republic of the)', 'codeAlpha3': 'COD', 'country-code': '180'},
-  {'name': 'Cook Islands', 'codeAlpha3': 'COK', 'country-code': '184'},
-  {'name': 'Costa Rica', 'codeAlpha3': 'CRI', 'country-code': '188'},
-  {'name': "Côte d'Ivoire", 'codeAlpha3': 'CIV', 'country-code': '384'},
-  {'name': 'Croatia', 'codeAlpha3': 'HRV', 'country-code': '191'},
-  {'name': 'Cuba', 'codeAlpha3': 'CUB', 'country-code': '192'},
-  {'name': 'Curaçao', 'codeAlpha3': 'CUW', 'country-code': '531'},
-  {'name': 'Cyprus', 'codeAlpha3': 'CYP', 'country-code': '196'},
-  {'name': 'Czech Republic', 'codeAlpha3': 'CZE', 'country-code': '203'},
-  {'name': 'Denmark', 'codeAlpha3': 'DNK', 'country-code': '208'},
-  {'name': 'Djibouti', 'codeAlpha3': 'DJI', 'country-code': '262'},
-  {'name': 'Dominica', 'codeAlpha3': 'DMA', 'country-code': '212'},
-  {'name': 'Dominican Republic', 'codeAlpha3': 'DOM', 'country-code': '214'},
-  {'name': 'Ecuador', 'codeAlpha3': 'ECU', 'country-code': '218'},
-  {'name': 'Egypt', 'codeAlpha3': 'EGY', 'country-code': '818'},
-  {'name': 'El Salvador', 'codeAlpha3': 'SLV', 'country-code': '222'},
-  {'name': 'Equatorial Guinea', 'codeAlpha3': 'GNQ', 'country-code': '226'},
-  {'name': 'Eritrea', 'codeAlpha3': 'ERI', 'country-code': '232'},
-  {'name': 'Estonia', 'codeAlpha3': 'EST', 'country-code': '233'},
-  {'name': 'Ethiopia', 'codeAlpha3': 'ETH', 'country-code': '231'},
-  {'name': 'Falkland Islands (Malvinas)', 'codeAlpha3': 'FLK', 'country-code': '238'},
-  {'name': 'Faroe Islands', 'codeAlpha3': 'FRO', 'country-code': '234'},
-  {'name': 'Fiji', 'codeAlpha3': 'FJI', 'country-code': '242'},
-  {'name': 'Finland', 'codeAlpha3': 'FIN', 'country-code': '246'},
-  {'name': 'France', 'codeAlpha3': 'FRA', 'country-code': '250'},
-  {'name': 'French Guiana', 'codeAlpha3': 'GUF', 'country-code': '254'},
-  {'name': 'French Polynesia', 'codeAlpha3': 'PYF', 'country-code': '258'},
-  {'name': 'French Southern Territories', 'codeAlpha3': 'ATF', 'country-code': '260'},
-  {'name': 'Gabon', 'codeAlpha3': 'GAB', 'country-code': '266'},
-  {'name': 'Gambia', 'codeAlpha3': 'GMB', 'country-code': '270'},
-  {'name': 'Georgia', 'codeAlpha3': 'GEO', 'country-code': '268'},
-  {'name': 'Germany', 'codeAlpha3': 'DEU', 'country-code': '276'},
-  {'name': 'Ghana', 'codeAlpha3': 'GHA', 'country-code': '288'},
-  {'name': 'Gibraltar', 'codeAlpha3': 'GIB', 'country-code': '292'},
-  {'name': 'Greece', 'codeAlpha3': 'GRC', 'country-code': '300'},
-  {'name': 'Greenland', 'codeAlpha3': 'GRL', 'country-code': '304'},
-  {'name': 'Grenada', 'codeAlpha3': 'GRD', 'country-code': '308'},
-  {'name': 'Guadeloupe', 'codeAlpha3': 'GLP', 'country-code': '312'},
-  {'name': 'Guam', 'codeAlpha3': 'GUM', 'country-code': '316'},
-  {'name': 'Guatemala', 'codeAlpha3': 'GTM', 'country-code': '320'},
-  {'name': 'Guernsey', 'codeAlpha3': 'GGY', 'country-code': '831'},
-  {'name': 'Guinea', 'codeAlpha3': 'GIN', 'country-code': '324'},
-  {'name': 'Guinea-Bissau', 'codeAlpha3': 'GNB', 'country-code': '624'},
-  {'name': 'Guyana', 'codeAlpha3': 'GUY', 'country-code': '328'},
-  {'name': 'Haiti', 'codeAlpha3': 'HTI', 'country-code': '332'},
-  {'name': 'Heard Island and McDonald Islands', 'codeAlpha3': 'HMD', 'country-code': '334'},
-  {'name': 'Holy See', 'codeAlpha3': 'VAT', 'country-code': '336'},
-  {'name': 'Honduras', 'codeAlpha3': 'HND', 'country-code': '340'},
-  {'name': 'Hong Kong', 'codeAlpha3': 'HKG', 'country-code': '344'},
-  {'name': 'Hungary', 'codeAlpha3': 'HUN', 'country-code': '348'},
-  {'name': 'Iceland', 'codeAlpha3': 'ISL', 'country-code': '352'},
-  {'name': 'India', 'codeAlpha3': 'IND', 'country-code': '356'},
-  {'name': 'Indonesia', 'codeAlpha3': 'IDN', 'country-code': '360'},
-  {'name': 'Iran (Islamic Republic of)', 'codeAlpha3': 'IRN', 'country-code': '364'},
-  {'name': 'Iraq', 'codeAlpha3': 'IRQ', 'country-code': '368'},
-  {'name': 'Ireland', 'codeAlpha3': 'IRL', 'country-code': '372'},
-  {'name': 'Isle of Man', 'codeAlpha3': 'IMN', 'country-code': '833'},
-  {'name': 'Israel', 'codeAlpha3': 'ISR', 'country-code': '376'},
-  {'name': 'Italy', 'codeAlpha3': 'ITA', 'country-code': '380'},
-  {'name': 'Jamaica', 'codeAlpha3': 'JAM', 'country-code': '388'},
-  {'name': 'Japan', 'codeAlpha3': 'JPN', 'country-code': '392'},
-  {'name': 'Jersey', 'codeAlpha3': 'JEY', 'country-code': '832'},
-  {'name': 'Jordan', 'codeAlpha3': 'JOR', 'country-code': '400'},
-  {'name': 'Kazakhstan', 'codeAlpha3': 'KAZ', 'country-code': '398'},
-  {'name': 'Kenya', 'codeAlpha3': 'KEN', 'country-code': '404'},
-  {'name': 'Kiribati', 'codeAlpha3': 'KIR', 'country-code': '296'},
-  {'name': "Korea (Democratic People's Republic of)", 'codeAlpha3': 'PRK', 'country-code': '408'},
-  {'name': 'Korea (Republic of)', 'codeAlpha3': 'KOR', 'country-code': '410'},
-  {'name': 'Kuwait', 'codeAlpha3': 'KWT', 'country-code': '414'},
-  {'name': 'Kyrgyzstan', 'codeAlpha3': 'KGZ', 'country-code': '417'},
-  {'name': "Lao People's Democratic Republic", 'codeAlpha3': 'LAO', 'country-code': '418'},
-  {'name': 'Latvia', 'codeAlpha3': 'LVA', 'country-code': '428'},
-  {'name': 'Lebanon', 'codeAlpha3': 'LBN', 'country-code': '422'},
-  {'name': 'Lesotho', 'codeAlpha3': 'LSO', 'country-code': '426'},
-  {'name': 'Liberia', 'codeAlpha3': 'LBR', 'country-code': '430'},
-  {'name': 'Libya', 'codeAlpha3': 'LBY', 'country-code': '434'},
-  {'name': 'Liechtenstein', 'codeAlpha3': 'LIE', 'country-code': '438'},
-  {'name': 'Lithuania', 'codeAlpha3': 'LTU', 'country-code': '440'},
-  {'name': 'Luxembourg', 'codeAlpha3': 'LUX', 'country-code': '442'},
-  {'name': 'Macao', 'codeAlpha3': 'MAC', 'country-code': '446'},
-  {'name': 'Macedonia (the former Yugoslav Republic of)', 'codeAlpha3': 'MKD', 'country-code': '807'},
-  {'name': 'Madagascar', 'codeAlpha3': 'MDG', 'country-code': '450'},
-  {'name': 'Malawi', 'codeAlpha3': 'MWI', 'country-code': '454'},
-  {'name': 'Malaysia', 'codeAlpha3': 'MYS', 'country-code': '458'},
-  {'name': 'Maldives', 'codeAlpha3': 'MDV', 'country-code': '462'},
-  {'name': 'Mali', 'codeAlpha3': 'MLI', 'country-code': '466'},
-  {'name': 'Malta', 'codeAlpha3': 'MLT', 'country-code': '470'},
-  {'name': 'Marshall Islands', 'codeAlpha3': 'MHL', 'country-code': '584'},
-  {'name': 'Martinique', 'codeAlpha3': 'MTQ', 'country-code': '474'},
-  {'name': 'Mauritania', 'codeAlpha3': 'MRT', 'country-code': '478'},
-  {'name': 'Mauritius', 'codeAlpha3': 'MUS', 'country-code': '480'},
-  {'name': 'Mayotte', 'codeAlpha3': 'MYT', 'country-code': '175'},
-  {'name': 'Mexico', 'codeAlpha3': 'MEX', 'country-code': '484'},
-  {'name': 'Micronesia (Federated States of)', 'codeAlpha3': 'FSM', 'country-code': '583'},
-  {'name': 'Moldova (Republic of)', 'codeAlpha3': 'MDA', 'country-code': '498'},
-  {'name': 'Monaco', 'codeAlpha3': 'MCO', 'country-code': '492'},
-  {'name': 'Mongolia', 'codeAlpha3': 'MNG', 'country-code': '496'},
-  {'name': 'Montenegro', 'codeAlpha3': 'MNE', 'country-code': '499'},
-  {'name': 'Montserrat', 'codeAlpha3': 'MSR', 'country-code': '500'},
-  {'name': 'Morocco', 'codeAlpha3': 'MAR', 'country-code': '504'},
-  {'name': 'Mozambique', 'codeAlpha3': 'MOZ', 'country-code': '508'},
-  {'name': 'Myanmar', 'codeAlpha3': 'MMR', 'country-code': '104'},
-  {'name': 'Namibia', 'codeAlpha3': 'NAM', 'country-code': '516'},
-  {'name': 'Nauru', 'codeAlpha3': 'NRU', 'country-code': '520'},
-  {'name': 'Nepal', 'codeAlpha3': 'NPL', 'country-code': '524'},
-  {'name': 'Netherlands', 'codeAlpha3': 'NLD', 'country-code': '528'},
-  {'name': 'New Caledonia', 'codeAlpha3': 'NCL', 'country-code': '540'},
-  {'name': 'New Zealand', 'codeAlpha3': 'NZL', 'country-code': '554'},
-  {'name': 'Nicaragua', 'codeAlpha3': 'NIC', 'country-code': '558'},
-  {'name': 'Niger', 'codeAlpha3': 'NER', 'country-code': '562'},
-  {'name': 'Nigeria', 'codeAlpha3': 'NGA', 'country-code': '566'},
-  {'name': 'Niue', 'codeAlpha3': 'NIU', 'country-code': '570'},
-  {'name': 'Norfolk Island', 'codeAlpha3': 'NFK', 'country-code': '574'},
-  {'name': 'Northern Mariana Islands', 'codeAlpha3': 'MNP', 'country-code': '580'},
-  {'name': 'Norway', 'codeAlpha3': 'NOR', 'country-code': '578'},
-  {'name': 'Oman', 'codeAlpha3': 'OMN', 'country-code': '512'},
-  {'name': 'Pakistan', 'codeAlpha3': 'PAK', 'country-code': '586'},
-  {'name': 'Palau', 'codeAlpha3': 'PLW', 'country-code': '585'},
-  {'name': 'Palestine, State of', 'codeAlpha3': 'PSE', 'country-code': '275'},
-  {'name': 'Panama', 'codeAlpha3': 'PAN', 'country-code': '591'},
-  {'name': 'Papua New Guinea', 'codeAlpha3': 'PNG', 'country-code': '598'},
-  {'name': 'Paraguay', 'codeAlpha3': 'PRY', 'country-code': '600'},
-  {'name': 'Peru', 'codeAlpha3': 'PER', 'country-code': '604'},
-  {'name': 'Philippines', 'codeAlpha3': 'PHL', 'country-code': '608'},
-  {'name': 'Pitcairn', 'codeAlpha3': 'PCN', 'country-code': '612'},
-  {'name': 'Poland', 'codeAlpha3': 'POL', 'country-code': '616'},
-  {'name': 'Portugal', 'codeAlpha3': 'PRT', 'country-code': '620'},
-  {'name': 'Puerto Rico', 'codeAlpha3': 'PRI', 'country-code': '630'},
-  {'name': 'Qatar', 'codeAlpha3': 'QAT', 'country-code': '634'},
-  {'name': 'Réunion', 'codeAlpha3': 'REU', 'country-code': '638'},
-  {'name': 'Romania', 'codeAlpha3': 'ROU', 'country-code': '642'},
-  {'name': 'Russian Federation', 'codeAlpha3': 'RUS', 'country-code': '643'},
-  {'name': 'Rwanda', 'codeAlpha3': 'RWA', 'country-code': '646'},
-  {'name': 'Saint Barthélemy', 'codeAlpha3': 'BLM', 'country-code': '652'},
-  {'name': 'Saint Helena, Ascension and Tristan da Cunha', 'codeAlpha3': 'SHN', 'country-code': '654'},
-  {'name': 'Saint Kitts and Nevis', 'codeAlpha3': 'KNA', 'country-code': '659'},
-  {'name': 'Saint Lucia', 'codeAlpha3': 'LCA', 'country-code': '662'},
-  {'name': 'Saint Martin (French part)', 'codeAlpha3': 'MAF', 'country-code': '663'},
-  {'name': 'Saint Pierre and Miquelon', 'codeAlpha3': 'SPM', 'country-code': '666'},
-  {'name': 'Saint Vincent and the Grenadines', 'codeAlpha3': 'VCT', 'country-code': '670'},
-  {'name': 'Samoa', 'codeAlpha3': 'WSM', 'country-code': '882'},
-  {'name': 'San Marino', 'codeAlpha3': 'SMR', 'country-code': '674'},
-  {'name': 'Sao Tome and Principe', 'codeAlpha3': 'STP', 'country-code': '678'},
-  {'name': 'Saudi Arabia', 'codeAlpha3': 'SAU', 'country-code': '682'},
-  {'name': 'Senegal', 'codeAlpha3': 'SEN', 'country-code': '686'},
-  {'name': 'Serbia', 'codeAlpha3': 'SRB', 'country-code': '688'},
-  {'name': 'Seychelles', 'codeAlpha3': 'SYC', 'country-code': '690'},
-  {'name': 'Sierra Leone', 'codeAlpha3': 'SLE', 'country-code': '694'},
-  {'name': 'Singapore', 'codeAlpha3': 'SGP', 'country-code': '702'},
-  {'name': 'Sint Maarten (Dutch part)', 'codeAlpha3': 'SXM', 'country-code': '534'},
-  {'name': 'Slovakia', 'codeAlpha3': 'SVK', 'country-code': '703'},
-  {'name': 'Slovenia', 'codeAlpha3': 'SVN', 'country-code': '705'},
-  {'name': 'Solomon Islands', 'codeAlpha3': 'SLB', 'country-code': '090'},
-  {'name': 'Somalia', 'codeAlpha3': 'SOM', 'country-code': '706'},
-  {'name': 'South Africa', 'codeAlpha3': 'ZAF', 'country-code': '710'},
-  {'name': 'South Georgia and the South Sandwich Islands', 'codeAlpha3': 'SGS', 'country-code': '239'},
-  {'name': 'South Sudan', 'codeAlpha3': 'SSD', 'country-code': '728'},
-  {'name': 'Spain', 'codeAlpha3': 'ESP', 'country-code': '724'},
-  {'name': 'Sri Lanka', 'codeAlpha3': 'LKA', 'country-code': '144'},
-  {'name': 'Sudan', 'codeAlpha3': 'SDN', 'country-code': '729'},
-  {'name': 'Suriname', 'codeAlpha3': 'SUR', 'country-code': '740'},
-  {'name': 'Svalbard and Jan Mayen', 'codeAlpha3': 'SJM', 'country-code': '744'},
-  {'name': 'Swaziland', 'codeAlpha3': 'SWZ', 'country-code': '748'},
-  {'name': 'Sweden', 'codeAlpha3': 'SWE', 'country-code': '752'},
-  {'name': 'Switzerland', 'codeAlpha3': 'CHE', 'country-code': '756'},
-  {'name': 'Syrian Arab Republic', 'codeAlpha3': 'SYR', 'country-code': '760'},
-  {'name': 'Taiwan, Province of China', 'codeAlpha3': 'TWN', 'country-code': '158'},
-  {'name': 'Tajikistan', 'codeAlpha3': 'TJK', 'country-code': '762'},
-  {'name': 'Tanzania, United Republic of', 'codeAlpha3': 'TZA', 'country-code': '834'},
-  {'name': 'Thailand', 'codeAlpha3': 'THA', 'country-code': '764'},
-  {'name': 'Timor-Leste', 'codeAlpha3': 'TLS', 'country-code': '626'},
-  {'name': 'Togo', 'codeAlpha3': 'TGO', 'country-code': '768'},
-  {'name': 'Tokelau', 'codeAlpha3': 'TKL', 'country-code': '772'},
-  {'name': 'Tonga', 'codeAlpha3': 'TON', 'country-code': '776'},
-  {'name': 'Trinidad and Tobago', 'codeAlpha3': 'TTO', 'country-code': '780'},
-  {'name': 'Tunisia', 'codeAlpha3': 'TUN', 'country-code': '788'},
-  {'name': 'Turkey', 'codeAlpha3': 'TUR', 'country-code': '792'},
-  {'name': 'Turkmenistan', 'codeAlpha3': 'TKM', 'country-code': '795'},
-  {'name': 'Turks and Caicos Islands', 'codeAlpha3': 'TCA', 'country-code': '796'},
-  {'name': 'Tuvalu', 'codeAlpha3': 'TUV', 'country-code': '798'},
-  {'name': 'Uganda', 'codeAlpha3': 'UGA', 'country-code': '800'},
-  {'name': 'Ukraine', 'codeAlpha3': 'UKR', 'country-code': '804'},
-  {'name': 'United Arab Emirates', 'codeAlpha3': 'ARE', 'country-code': '784'},
-  {'name': 'United Kingdom of Great Britain and Northern Ireland', 'codeAlpha3': 'GBR', 'country-code': '826'},
-  {'name': 'United States of America', 'codeAlpha3': 'USA', 'country-code': '840'},
-  {'name': 'United States Minor Outlying Islands', 'codeAlpha3': 'UMI', 'country-code': '581'},
-  {'name': 'Uruguay', 'codeAlpha3': 'URY', 'country-code': '858'},
-  {'name': 'Uzbekistan', 'codeAlpha3': 'UZB', 'country-code': '860'},
-  {'name': 'Vanuatu', 'codeAlpha3': 'VUT', 'country-code': '548'},
-  {'name': 'Venezuela (Bolivarian Republic of)', 'codeAlpha3': 'VEN', 'country-code': '862'},
-  {'name': 'Viet Nam', 'codeAlpha3': 'VNM', 'country-code': '704'},
-  {'name': 'Virgin Islands (British)', 'codeAlpha3': 'VGB', 'country-code': '092'},
-  {'name': 'Virgin Islands (U.S.)', 'codeAlpha3': 'VIR', 'country-code': '850'},
-  {'name': 'Wallis and Futuna', 'codeAlpha3': 'WLF', 'country-code': '876'},
-  {'name': 'Western Sahara', 'codeAlpha3': 'ESH', 'country-code': '732'},
-  {'name': 'Yemen', 'codeAlpha3': 'YEM', 'country-code': '887'},
-  {'name': 'Zambia', 'codeAlpha3': 'ZMB', 'country-code': '894'},
-  {'name': 'Zimbabwe', 'codeAlpha3': 'ZWE', 'country-code': '716'}
-]
-/* unused harmony export COUNTRY_LIST */
+var utils = /*#__PURE__*/Object.freeze({
+  COUNTRY_LIST: COUNTRY_LIST
+});
+
 
 
 
 /***/ }),
-/* 7 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
- * jQuery JavaScript Library v3.2.1
+ * jQuery JavaScript Library v3.3.1
  * https://jquery.com/
  *
  * Includes Sizzle.js
@@ -974,7 +675,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
  * Released under the MIT license
  * https://jquery.org/license
  *
- * Date: 2017-03-20T18:59Z
+ * Date: 2018-01-20T17:24Z
  */
 ( function( global, factory ) {
 
@@ -1036,16 +737,57 @@ var ObjectFunctionString = fnToString.call( Object );
 
 var support = {};
 
+var isFunction = function isFunction( obj ) {
+
+      // Support: Chrome <=57, Firefox <=52
+      // In some browsers, typeof returns "function" for HTML <object> elements
+      // (i.e., `typeof document.createElement( "object" ) === "function"`).
+      // We don't want to classify *any* DOM node as a function.
+      return typeof obj === "function" && typeof obj.nodeType !== "number";
+  };
 
 
-	function DOMEval( code, doc ) {
+var isWindow = function isWindow( obj ) {
+		return obj != null && obj === obj.window;
+	};
+
+
+
+
+	var preservedScriptAttributes = {
+		type: true,
+		src: true,
+		noModule: true
+	};
+
+	function DOMEval( code, doc, node ) {
 		doc = doc || document;
 
-		var script = doc.createElement( "script" );
+		var i,
+			script = doc.createElement( "script" );
 
 		script.text = code;
+		if ( node ) {
+			for ( i in preservedScriptAttributes ) {
+				if ( node[ i ] ) {
+					script[ i ] = node[ i ];
+				}
+			}
+		}
 		doc.head.appendChild( script ).parentNode.removeChild( script );
 	}
+
+
+function toType( obj ) {
+	if ( obj == null ) {
+		return obj + "";
+	}
+
+	// Support: Android <=2.3 only (functionish RegExp)
+	return typeof obj === "object" || typeof obj === "function" ?
+		class2type[ toString.call( obj ) ] || "object" :
+		typeof obj;
+}
 /* global Symbol */
 // Defining this global in .eslintrc.json would create a danger of using the global
 // unguarded in another place, it seems safer to define global only for this module
@@ -1053,7 +795,7 @@ var support = {};
 
 
 var
-	version = "3.2.1",
+	version = "3.3.1",
 
 	// Define a local copy of jQuery
 	jQuery = function( selector, context ) {
@@ -1065,16 +807,7 @@ var
 
 	// Support: Android <=4.0 only
 	// Make sure we trim BOM and NBSP
-	rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g,
-
-	// Matches dashed string for camelizing
-	rmsPrefix = /^-ms-/,
-	rdashAlpha = /-([a-z])/g,
-
-	// Used by jQuery.camelCase as callback to replace()
-	fcamelCase = function( all, letter ) {
-		return letter.toUpperCase();
-	};
+	rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
 
 jQuery.fn = jQuery.prototype = {
 
@@ -1174,7 +907,7 @@ jQuery.extend = jQuery.fn.extend = function() {
 	}
 
 	// Handle case when target is a string or something (possible in deep copy)
-	if ( typeof target !== "object" && !jQuery.isFunction( target ) ) {
+	if ( typeof target !== "object" && !isFunction( target ) ) {
 		target = {};
 	}
 
@@ -1240,28 +973,6 @@ jQuery.extend( {
 
 	noop: function() {},
 
-	isFunction: function( obj ) {
-		return jQuery.type( obj ) === "function";
-	},
-
-	isWindow: function( obj ) {
-		return obj != null && obj === obj.window;
-	},
-
-	isNumeric: function( obj ) {
-
-		// As of jQuery 3.0, isNumeric is limited to
-		// strings and numbers (primitives or objects)
-		// that can be coerced to finite numbers (gh-2662)
-		var type = jQuery.type( obj );
-		return ( type === "number" || type === "string" ) &&
-
-			// parseFloat NaNs numeric-cast false positives ("")
-			// ...but misinterprets leading-number strings, particularly hex literals ("0x...")
-			// subtraction forces infinities to NaN
-			!isNaN( obj - parseFloat( obj ) );
-	},
-
 	isPlainObject: function( obj ) {
 		var proto, Ctor;
 
@@ -1295,27 +1006,9 @@ jQuery.extend( {
 		return true;
 	},
 
-	type: function( obj ) {
-		if ( obj == null ) {
-			return obj + "";
-		}
-
-		// Support: Android <=2.3 only (functionish RegExp)
-		return typeof obj === "object" || typeof obj === "function" ?
-			class2type[ toString.call( obj ) ] || "object" :
-			typeof obj;
-	},
-
 	// Evaluates a script in a global context
 	globalEval: function( code ) {
 		DOMEval( code );
-	},
-
-	// Convert dashed to camelCase; used by the css and data modules
-	// Support: IE <=9 - 11, Edge 12 - 13
-	// Microsoft forgot to hump their vendor prefix (#9572)
-	camelCase: function( string ) {
-		return string.replace( rmsPrefix, "ms-" ).replace( rdashAlpha, fcamelCase );
 	},
 
 	each: function( obj, callback ) {
@@ -1438,37 +1131,6 @@ jQuery.extend( {
 	// A global GUID counter for objects
 	guid: 1,
 
-	// Bind a function to a context, optionally partially applying any
-	// arguments.
-	proxy: function( fn, context ) {
-		var tmp, args, proxy;
-
-		if ( typeof context === "string" ) {
-			tmp = fn[ context ];
-			context = fn;
-			fn = tmp;
-		}
-
-		// Quick check to determine if target is callable, in the spec
-		// this throws a TypeError, but we will just return undefined.
-		if ( !jQuery.isFunction( fn ) ) {
-			return undefined;
-		}
-
-		// Simulated bind
-		args = slice.call( arguments, 2 );
-		proxy = function() {
-			return fn.apply( context || this, args.concat( slice.call( arguments ) ) );
-		};
-
-		// Set the guid of unique handler to the same of original handler, so it can be removed
-		proxy.guid = fn.guid = fn.guid || jQuery.guid++;
-
-		return proxy;
-	},
-
-	now: Date.now,
-
 	// jQuery.support is not used in Core but other projects attach their
 	// properties to it so it needs to exist.
 	support: support
@@ -1491,9 +1153,9 @@ function isArrayLike( obj ) {
 	// hasOwn isn't used here due to false negatives
 	// regarding Nodelist length in IE
 	var length = !!obj && "length" in obj && obj.length,
-		type = jQuery.type( obj );
+		type = toType( obj );
 
-	if ( type === "function" || jQuery.isWindow( obj ) ) {
+	if ( isFunction( obj ) || isWindow( obj ) ) {
 		return false;
 	}
 
@@ -3813,11 +3475,9 @@ var rsingleTag = ( /^<([a-z][^\/\0>:\x20\t\r\n\f]*)[\x20\t\r\n\f]*\/?>(?:<\/\1>|
 
 
 
-var risSimple = /^.[^:#\[\.,]*$/;
-
 // Implement the identical functionality for filter and not
 function winnow( elements, qualifier, not ) {
-	if ( jQuery.isFunction( qualifier ) ) {
+	if ( isFunction( qualifier ) ) {
 		return jQuery.grep( elements, function( elem, i ) {
 			return !!qualifier.call( elem, i, elem ) !== not;
 		} );
@@ -3837,16 +3497,8 @@ function winnow( elements, qualifier, not ) {
 		} );
 	}
 
-	// Simple selector that can be filtered directly, removing non-Elements
-	if ( risSimple.test( qualifier ) ) {
-		return jQuery.filter( qualifier, elements, not );
-	}
-
-	// Complex selector, compare the two sets, removing non-Elements
-	qualifier = jQuery.filter( qualifier, elements );
-	return jQuery.grep( elements, function( elem ) {
-		return ( indexOf.call( qualifier, elem ) > -1 ) !== not && elem.nodeType === 1;
-	} );
+	// Filtered directly for both simple and complex selectors
+	return jQuery.filter( qualifier, elements, not );
 }
 
 jQuery.filter = function( expr, elems, not ) {
@@ -3967,7 +3619,7 @@ var rootjQuery,
 						for ( match in context ) {
 
 							// Properties of context are called as methods if possible
-							if ( jQuery.isFunction( this[ match ] ) ) {
+							if ( isFunction( this[ match ] ) ) {
 								this[ match ]( context[ match ] );
 
 							// ...and otherwise set as attributes
@@ -4010,7 +3662,7 @@ var rootjQuery,
 
 		// HANDLE: $(function)
 		// Shortcut for document ready
-		} else if ( jQuery.isFunction( selector ) ) {
+		} else if ( isFunction( selector ) ) {
 			return root.ready !== undefined ?
 				root.ready( selector ) :
 
@@ -4325,11 +3977,11 @@ jQuery.Callbacks = function( options ) {
 
 					( function add( args ) {
 						jQuery.each( args, function( _, arg ) {
-							if ( jQuery.isFunction( arg ) ) {
+							if ( isFunction( arg ) ) {
 								if ( !options.unique || !self.has( arg ) ) {
 									list.push( arg );
 								}
-							} else if ( arg && arg.length && jQuery.type( arg ) !== "string" ) {
+							} else if ( arg && arg.length && toType( arg ) !== "string" ) {
 
 								// Inspect recursively
 								add( arg );
@@ -4444,11 +4096,11 @@ function adoptValue( value, resolve, reject, noValue ) {
 	try {
 
 		// Check for promise aspect first to privilege synchronous behavior
-		if ( value && jQuery.isFunction( ( method = value.promise ) ) ) {
+		if ( value && isFunction( ( method = value.promise ) ) ) {
 			method.call( value ).done( resolve ).fail( reject );
 
 		// Other thenables
-		} else if ( value && jQuery.isFunction( ( method = value.then ) ) ) {
+		} else if ( value && isFunction( ( method = value.then ) ) ) {
 			method.call( value, resolve, reject );
 
 		// Other non-thenables
@@ -4506,14 +4158,14 @@ jQuery.extend( {
 						jQuery.each( tuples, function( i, tuple ) {
 
 							// Map tuples (progress, done, fail) to arguments (done, fail, progress)
-							var fn = jQuery.isFunction( fns[ tuple[ 4 ] ] ) && fns[ tuple[ 4 ] ];
+							var fn = isFunction( fns[ tuple[ 4 ] ] ) && fns[ tuple[ 4 ] ];
 
 							// deferred.progress(function() { bind to newDefer or newDefer.notify })
 							// deferred.done(function() { bind to newDefer or newDefer.resolve })
 							// deferred.fail(function() { bind to newDefer or newDefer.reject })
 							deferred[ tuple[ 1 ] ]( function() {
 								var returned = fn && fn.apply( this, arguments );
-								if ( returned && jQuery.isFunction( returned.promise ) ) {
+								if ( returned && isFunction( returned.promise ) ) {
 									returned.promise()
 										.progress( newDefer.notify )
 										.done( newDefer.resolve )
@@ -4567,7 +4219,7 @@ jQuery.extend( {
 										returned.then;
 
 									// Handle a returned thenable
-									if ( jQuery.isFunction( then ) ) {
+									if ( isFunction( then ) ) {
 
 										// Special processors (notify) just wait for resolution
 										if ( special ) {
@@ -4663,7 +4315,7 @@ jQuery.extend( {
 							resolve(
 								0,
 								newDefer,
-								jQuery.isFunction( onProgress ) ?
+								isFunction( onProgress ) ?
 									onProgress :
 									Identity,
 								newDefer.notifyWith
@@ -4675,7 +4327,7 @@ jQuery.extend( {
 							resolve(
 								0,
 								newDefer,
-								jQuery.isFunction( onFulfilled ) ?
+								isFunction( onFulfilled ) ?
 									onFulfilled :
 									Identity
 							)
@@ -4686,7 +4338,7 @@ jQuery.extend( {
 							resolve(
 								0,
 								newDefer,
-								jQuery.isFunction( onRejected ) ?
+								isFunction( onRejected ) ?
 									onRejected :
 									Thrower
 							)
@@ -4726,8 +4378,15 @@ jQuery.extend( {
 					// fulfilled_callbacks.disable
 					tuples[ 3 - i ][ 2 ].disable,
 
+					// rejected_handlers.disable
+					// fulfilled_handlers.disable
+					tuples[ 3 - i ][ 3 ].disable,
+
 					// progress_callbacks.lock
-					tuples[ 0 ][ 2 ].lock
+					tuples[ 0 ][ 2 ].lock,
+
+					// progress_handlers.lock
+					tuples[ 0 ][ 3 ].lock
 				);
 			}
 
@@ -4797,7 +4456,7 @@ jQuery.extend( {
 
 			// Use .then() to unwrap secondary thenables (cf. gh-3000)
 			if ( master.state() === "pending" ||
-				jQuery.isFunction( resolveValues[ i ] && resolveValues[ i ].then ) ) {
+				isFunction( resolveValues[ i ] && resolveValues[ i ].then ) ) {
 
 				return master.then();
 			}
@@ -4925,7 +4584,7 @@ var access = function( elems, fn, key, value, chainable, emptyGet, raw ) {
 		bulk = key == null;
 
 	// Sets many values
-	if ( jQuery.type( key ) === "object" ) {
+	if ( toType( key ) === "object" ) {
 		chainable = true;
 		for ( i in key ) {
 			access( elems, fn, i, key[ i ], true, emptyGet, raw );
@@ -4935,7 +4594,7 @@ var access = function( elems, fn, key, value, chainable, emptyGet, raw ) {
 	} else if ( value !== undefined ) {
 		chainable = true;
 
-		if ( !jQuery.isFunction( value ) ) {
+		if ( !isFunction( value ) ) {
 			raw = true;
 		}
 
@@ -4977,6 +4636,23 @@ var access = function( elems, fn, key, value, chainable, emptyGet, raw ) {
 
 	return len ? fn( elems[ 0 ], key ) : emptyGet;
 };
+
+
+// Matches dashed string for camelizing
+var rmsPrefix = /^-ms-/,
+	rdashAlpha = /-([a-z])/g;
+
+// Used by camelCase as callback to replace()
+function fcamelCase( all, letter ) {
+	return letter.toUpperCase();
+}
+
+// Convert dashed to camelCase; used by the css and data modules
+// Support: IE <=9 - 11, Edge 12 - 15
+// Microsoft forgot to hump their vendor prefix (#9572)
+function camelCase( string ) {
+	return string.replace( rmsPrefix, "ms-" ).replace( rdashAlpha, fcamelCase );
+}
 var acceptData = function( owner ) {
 
 	// Accepts only:
@@ -5039,14 +4715,14 @@ Data.prototype = {
 		// Handle: [ owner, key, value ] args
 		// Always use camelCase key (gh-2257)
 		if ( typeof data === "string" ) {
-			cache[ jQuery.camelCase( data ) ] = value;
+			cache[ camelCase( data ) ] = value;
 
 		// Handle: [ owner, { properties } ] args
 		} else {
 
 			// Copy the properties one-by-one to the cache object
 			for ( prop in data ) {
-				cache[ jQuery.camelCase( prop ) ] = data[ prop ];
+				cache[ camelCase( prop ) ] = data[ prop ];
 			}
 		}
 		return cache;
@@ -5056,7 +4732,7 @@ Data.prototype = {
 			this.cache( owner ) :
 
 			// Always use camelCase key (gh-2257)
-			owner[ this.expando ] && owner[ this.expando ][ jQuery.camelCase( key ) ];
+			owner[ this.expando ] && owner[ this.expando ][ camelCase( key ) ];
 	},
 	access: function( owner, key, value ) {
 
@@ -5104,9 +4780,9 @@ Data.prototype = {
 
 				// If key is an array of keys...
 				// We always set camelCase keys, so remove that.
-				key = key.map( jQuery.camelCase );
+				key = key.map( camelCase );
 			} else {
-				key = jQuery.camelCase( key );
+				key = camelCase( key );
 
 				// If a key with the spaces exists, use it.
 				// Otherwise, create an array by matching non-whitespace
@@ -5252,7 +4928,7 @@ jQuery.fn.extend( {
 						if ( attrs[ i ] ) {
 							name = attrs[ i ].name;
 							if ( name.indexOf( "data-" ) === 0 ) {
-								name = jQuery.camelCase( name.slice( 5 ) );
+								name = camelCase( name.slice( 5 ) );
 								dataAttr( elem, name, data[ name ] );
 							}
 						}
@@ -5499,8 +5175,7 @@ var swap = function( elem, options, callback, args ) {
 
 
 function adjustCSS( elem, prop, valueParts, tween ) {
-	var adjusted,
-		scale = 1,
+	var adjusted, scale,
 		maxIterations = 20,
 		currentValue = tween ?
 			function() {
@@ -5518,30 +5193,33 @@ function adjustCSS( elem, prop, valueParts, tween ) {
 
 	if ( initialInUnit && initialInUnit[ 3 ] !== unit ) {
 
+		// Support: Firefox <=54
+		// Halve the iteration target value to prevent interference from CSS upper bounds (gh-2144)
+		initial = initial / 2;
+
 		// Trust units reported by jQuery.css
 		unit = unit || initialInUnit[ 3 ];
-
-		// Make sure we update the tween properties later on
-		valueParts = valueParts || [];
 
 		// Iteratively approximate from a nonzero starting point
 		initialInUnit = +initial || 1;
 
-		do {
+		while ( maxIterations-- ) {
 
-			// If previous iteration zeroed out, double until we get *something*.
-			// Use string for doubling so we don't accidentally see scale as unchanged below
-			scale = scale || ".5";
-
-			// Adjust and apply
-			initialInUnit = initialInUnit / scale;
+			// Evaluate and update our best guess (doubling guesses that zero out).
+			// Finish if the scale equals or crosses 1 (making the old*new product non-positive).
 			jQuery.style( elem, prop, initialInUnit + unit );
+			if ( ( 1 - scale ) * ( 1 - ( scale = currentValue() / initial || 0.5 ) ) <= 0 ) {
+				maxIterations = 0;
+			}
+			initialInUnit = initialInUnit / scale;
 
-		// Update scale, tolerating zero or NaN from tween.cur()
-		// Break the loop if scale is unchanged or perfect, or if we've just had enough.
-		} while (
-			scale !== ( scale = currentValue() / initial ) && scale !== 1 && --maxIterations
-		);
+		}
+
+		initialInUnit = initialInUnit * 2;
+		jQuery.style( elem, prop, initialInUnit + unit );
+
+		// Make sure we update the tween properties later on
+		valueParts = valueParts || [];
 	}
 
 	if ( valueParts ) {
@@ -5659,7 +5337,7 @@ var rcheckableType = ( /^(?:checkbox|radio)$/i );
 
 var rtagName = ( /<([a-z][^\/\0>\x20\t\r\n\f]+)/i );
 
-var rscriptType = ( /^$|\/(?:java|ecma)script/i );
+var rscriptType = ( /^$|^module$|\/(?:java|ecma)script/i );
 
 
 
@@ -5741,7 +5419,7 @@ function buildFragment( elems, context, scripts, selection, ignored ) {
 		if ( elem || elem === 0 ) {
 
 			// Add nodes directly
-			if ( jQuery.type( elem ) === "object" ) {
+			if ( toType( elem ) === "object" ) {
 
 				// Support: Android <=4.0 only, PhantomJS 1 only
 				// push.apply(_, arraylike) throws on ancient WebKit
@@ -6251,7 +5929,7 @@ jQuery.event = {
 			enumerable: true,
 			configurable: true,
 
-			get: jQuery.isFunction( hook ) ?
+			get: isFunction( hook ) ?
 				function() {
 					if ( this.originalEvent ) {
 							return hook( this.originalEvent );
@@ -6386,7 +6064,7 @@ jQuery.Event = function( src, props ) {
 	}
 
 	// Create a timestamp if incoming event doesn't have one
-	this.timeStamp = src && src.timeStamp || jQuery.now();
+	this.timeStamp = src && src.timeStamp || Date.now();
 
 	// Mark it as fixed
 	this[ jQuery.expando ] = true;
@@ -6585,14 +6263,13 @@ var
 
 	/* eslint-enable */
 
-	// Support: IE <=10 - 11, Edge 12 - 13
+	// Support: IE <=10 - 11, Edge 12 - 13 only
 	// In IE/Edge using regex groups here causes severe slowdowns.
 	// See https://connect.microsoft.com/IE/feedback/details/1736512/
 	rnoInnerhtml = /<script|<style|<link/i,
 
 	// checked="checked" or checked
 	rchecked = /checked\s*(?:[^=]|=\s*.checked.)/i,
-	rscriptTypeMasked = /^true\/(.*)/,
 	rcleanScript = /^\s*<!(?:\[CDATA\[|--)|(?:\]\]|--)>\s*$/g;
 
 // Prefer a tbody over its parent table for containing new rows
@@ -6600,7 +6277,7 @@ function manipulationTarget( elem, content ) {
 	if ( nodeName( elem, "table" ) &&
 		nodeName( content.nodeType !== 11 ? content : content.firstChild, "tr" ) ) {
 
-		return jQuery( ">tbody", elem )[ 0 ] || elem;
+		return jQuery( elem ).children( "tbody" )[ 0 ] || elem;
 	}
 
 	return elem;
@@ -6612,10 +6289,8 @@ function disableScript( elem ) {
 	return elem;
 }
 function restoreScript( elem ) {
-	var match = rscriptTypeMasked.exec( elem.type );
-
-	if ( match ) {
-		elem.type = match[ 1 ];
+	if ( ( elem.type || "" ).slice( 0, 5 ) === "true/" ) {
+		elem.type = elem.type.slice( 5 );
 	} else {
 		elem.removeAttribute( "type" );
 	}
@@ -6681,15 +6356,15 @@ function domManip( collection, args, callback, ignored ) {
 		l = collection.length,
 		iNoClone = l - 1,
 		value = args[ 0 ],
-		isFunction = jQuery.isFunction( value );
+		valueIsFunction = isFunction( value );
 
 	// We can't cloneNode fragments that contain checked, in WebKit
-	if ( isFunction ||
+	if ( valueIsFunction ||
 			( l > 1 && typeof value === "string" &&
 				!support.checkClone && rchecked.test( value ) ) ) {
 		return collection.each( function( index ) {
 			var self = collection.eq( index );
-			if ( isFunction ) {
+			if ( valueIsFunction ) {
 				args[ 0 ] = value.call( this, index, self.html() );
 			}
 			domManip( self, args, callback, ignored );
@@ -6743,14 +6418,14 @@ function domManip( collection, args, callback, ignored ) {
 						!dataPriv.access( node, "globalEval" ) &&
 						jQuery.contains( doc, node ) ) {
 
-						if ( node.src ) {
+						if ( node.src && ( node.type || "" ).toLowerCase()  !== "module" ) {
 
 							// Optional AJAX dependency, but won't run scripts if not present
 							if ( jQuery._evalUrl ) {
 								jQuery._evalUrl( node.src );
 							}
 						} else {
-							DOMEval( node.textContent.replace( rcleanScript, "" ), doc );
+							DOMEval( node.textContent.replace( rcleanScript, "" ), doc, node );
 						}
 					}
 				}
@@ -7030,8 +6705,6 @@ jQuery.each( {
 		return this.pushStack( ret );
 	};
 } );
-var rmargin = ( /^margin/ );
-
 var rnumnonpx = new RegExp( "^(" + pnum + ")(?!px)[a-z%]+$", "i" );
 
 var getStyles = function( elem ) {
@@ -7048,6 +6721,8 @@ var getStyles = function( elem ) {
 		return view.getComputedStyle( elem );
 	};
 
+var rboxStyle = new RegExp( cssExpand.join( "|" ), "i" );
+
 
 
 ( function() {
@@ -7061,25 +6736,33 @@ var getStyles = function( elem ) {
 			return;
 		}
 
+		container.style.cssText = "position:absolute;left:-11111px;width:60px;" +
+			"margin-top:1px;padding:0;border:0";
 		div.style.cssText =
-			"box-sizing:border-box;" +
-			"position:relative;display:block;" +
+			"position:relative;display:block;box-sizing:border-box;overflow:scroll;" +
 			"margin:auto;border:1px;padding:1px;" +
-			"top:1%;width:50%";
-		div.innerHTML = "";
-		documentElement.appendChild( container );
+			"width:60%;top:1%";
+		documentElement.appendChild( container ).appendChild( div );
 
 		var divStyle = window.getComputedStyle( div );
 		pixelPositionVal = divStyle.top !== "1%";
 
 		// Support: Android 4.0 - 4.3 only, Firefox <=3 - 44
-		reliableMarginLeftVal = divStyle.marginLeft === "2px";
-		boxSizingReliableVal = divStyle.width === "4px";
+		reliableMarginLeftVal = roundPixelMeasures( divStyle.marginLeft ) === 12;
 
-		// Support: Android 4.0 - 4.3 only
+		// Support: Android 4.0 - 4.3 only, Safari <=9.1 - 10.1, iOS <=7.0 - 9.3
 		// Some styles come back with percentage values, even though they shouldn't
-		div.style.marginRight = "50%";
-		pixelMarginRightVal = divStyle.marginRight === "4px";
+		div.style.right = "60%";
+		pixelBoxStylesVal = roundPixelMeasures( divStyle.right ) === 36;
+
+		// Support: IE 9 - 11 only
+		// Detect misreporting of content dimensions for box-sizing:border-box elements
+		boxSizingReliableVal = roundPixelMeasures( divStyle.width ) === 36;
+
+		// Support: IE 9 only
+		// Detect overflow:scroll screwiness (gh-3699)
+		div.style.position = "absolute";
+		scrollboxSizeVal = div.offsetWidth === 36 || "absolute";
 
 		documentElement.removeChild( container );
 
@@ -7088,7 +6771,12 @@ var getStyles = function( elem ) {
 		div = null;
 	}
 
-	var pixelPositionVal, boxSizingReliableVal, pixelMarginRightVal, reliableMarginLeftVal,
+	function roundPixelMeasures( measure ) {
+		return Math.round( parseFloat( measure ) );
+	}
+
+	var pixelPositionVal, boxSizingReliableVal, scrollboxSizeVal, pixelBoxStylesVal,
+		reliableMarginLeftVal,
 		container = document.createElement( "div" ),
 		div = document.createElement( "div" );
 
@@ -7103,26 +6791,26 @@ var getStyles = function( elem ) {
 	div.cloneNode( true ).style.backgroundClip = "";
 	support.clearCloneStyle = div.style.backgroundClip === "content-box";
 
-	container.style.cssText = "border:0;width:8px;height:0;top:0;left:-9999px;" +
-		"padding:0;margin-top:1px;position:absolute";
-	container.appendChild( div );
-
 	jQuery.extend( support, {
-		pixelPosition: function() {
-			computeStyleTests();
-			return pixelPositionVal;
-		},
 		boxSizingReliable: function() {
 			computeStyleTests();
 			return boxSizingReliableVal;
 		},
-		pixelMarginRight: function() {
+		pixelBoxStyles: function() {
 			computeStyleTests();
-			return pixelMarginRightVal;
+			return pixelBoxStylesVal;
+		},
+		pixelPosition: function() {
+			computeStyleTests();
+			return pixelPositionVal;
 		},
 		reliableMarginLeft: function() {
 			computeStyleTests();
 			return reliableMarginLeftVal;
+		},
+		scrollboxSize: function() {
+			computeStyleTests();
+			return scrollboxSizeVal;
 		}
 	} );
 } )();
@@ -7154,7 +6842,7 @@ function curCSS( elem, name, computed ) {
 		// but width seems to be reliably pixels.
 		// This is against the CSSOM draft spec:
 		// https://drafts.csswg.org/cssom/#resolved-values
-		if ( !support.pixelMarginRight() && rnumnonpx.test( ret ) && rmargin.test( name ) ) {
+		if ( !support.pixelBoxStyles() && rnumnonpx.test( ret ) && rboxStyle.test( name ) ) {
 
 			// Remember the original values
 			width = style.width;
@@ -7259,87 +6947,120 @@ function setPositiveNumber( elem, value, subtract ) {
 		value;
 }
 
-function augmentWidthOrHeight( elem, name, extra, isBorderBox, styles ) {
-	var i,
-		val = 0;
+function boxModelAdjustment( elem, dimension, box, isBorderBox, styles, computedVal ) {
+	var i = dimension === "width" ? 1 : 0,
+		extra = 0,
+		delta = 0;
 
-	// If we already have the right measurement, avoid augmentation
-	if ( extra === ( isBorderBox ? "border" : "content" ) ) {
-		i = 4;
-
-	// Otherwise initialize for horizontal or vertical properties
-	} else {
-		i = name === "width" ? 1 : 0;
+	// Adjustment may not be necessary
+	if ( box === ( isBorderBox ? "border" : "content" ) ) {
+		return 0;
 	}
 
 	for ( ; i < 4; i += 2 ) {
 
-		// Both box models exclude margin, so add it if we want it
-		if ( extra === "margin" ) {
-			val += jQuery.css( elem, extra + cssExpand[ i ], true, styles );
+		// Both box models exclude margin
+		if ( box === "margin" ) {
+			delta += jQuery.css( elem, box + cssExpand[ i ], true, styles );
 		}
 
-		if ( isBorderBox ) {
+		// If we get here with a content-box, we're seeking "padding" or "border" or "margin"
+		if ( !isBorderBox ) {
 
-			// border-box includes padding, so remove it if we want content
-			if ( extra === "content" ) {
-				val -= jQuery.css( elem, "padding" + cssExpand[ i ], true, styles );
+			// Add padding
+			delta += jQuery.css( elem, "padding" + cssExpand[ i ], true, styles );
+
+			// For "border" or "margin", add border
+			if ( box !== "padding" ) {
+				delta += jQuery.css( elem, "border" + cssExpand[ i ] + "Width", true, styles );
+
+			// But still keep track of it otherwise
+			} else {
+				extra += jQuery.css( elem, "border" + cssExpand[ i ] + "Width", true, styles );
 			}
 
-			// At this point, extra isn't border nor margin, so remove border
-			if ( extra !== "margin" ) {
-				val -= jQuery.css( elem, "border" + cssExpand[ i ] + "Width", true, styles );
-			}
+		// If we get here with a border-box (content + padding + border), we're seeking "content" or
+		// "padding" or "margin"
 		} else {
 
-			// At this point, extra isn't content, so add padding
-			val += jQuery.css( elem, "padding" + cssExpand[ i ], true, styles );
+			// For "content", subtract padding
+			if ( box === "content" ) {
+				delta -= jQuery.css( elem, "padding" + cssExpand[ i ], true, styles );
+			}
 
-			// At this point, extra isn't content nor padding, so add border
-			if ( extra !== "padding" ) {
-				val += jQuery.css( elem, "border" + cssExpand[ i ] + "Width", true, styles );
+			// For "content" or "padding", subtract border
+			if ( box !== "margin" ) {
+				delta -= jQuery.css( elem, "border" + cssExpand[ i ] + "Width", true, styles );
 			}
 		}
 	}
 
-	return val;
+	// Account for positive content-box scroll gutter when requested by providing computedVal
+	if ( !isBorderBox && computedVal >= 0 ) {
+
+		// offsetWidth/offsetHeight is a rounded sum of content, padding, scroll gutter, and border
+		// Assuming integer scroll gutter, subtract the rest and round down
+		delta += Math.max( 0, Math.ceil(
+			elem[ "offset" + dimension[ 0 ].toUpperCase() + dimension.slice( 1 ) ] -
+			computedVal -
+			delta -
+			extra -
+			0.5
+		) );
+	}
+
+	return delta;
 }
 
-function getWidthOrHeight( elem, name, extra ) {
+function getWidthOrHeight( elem, dimension, extra ) {
 
 	// Start with computed style
-	var valueIsBorderBox,
-		styles = getStyles( elem ),
-		val = curCSS( elem, name, styles ),
-		isBorderBox = jQuery.css( elem, "boxSizing", false, styles ) === "border-box";
+	var styles = getStyles( elem ),
+		val = curCSS( elem, dimension, styles ),
+		isBorderBox = jQuery.css( elem, "boxSizing", false, styles ) === "border-box",
+		valueIsBorderBox = isBorderBox;
 
-	// Computed unit is not pixels. Stop here and return.
+	// Support: Firefox <=54
+	// Return a confounding non-pixel value or feign ignorance, as appropriate.
 	if ( rnumnonpx.test( val ) ) {
-		return val;
+		if ( !extra ) {
+			return val;
+		}
+		val = "auto";
 	}
 
 	// Check for style in case a browser which returns unreliable values
 	// for getComputedStyle silently falls back to the reliable elem.style
-	valueIsBorderBox = isBorderBox &&
-		( support.boxSizingReliable() || val === elem.style[ name ] );
+	valueIsBorderBox = valueIsBorderBox &&
+		( support.boxSizingReliable() || val === elem.style[ dimension ] );
 
-	// Fall back to offsetWidth/Height when value is "auto"
+	// Fall back to offsetWidth/offsetHeight when value is "auto"
 	// This happens for inline elements with no explicit setting (gh-3571)
-	if ( val === "auto" ) {
-		val = elem[ "offset" + name[ 0 ].toUpperCase() + name.slice( 1 ) ];
+	// Support: Android <=4.1 - 4.3 only
+	// Also use offsetWidth/offsetHeight for misreported inline dimensions (gh-3602)
+	if ( val === "auto" ||
+		!parseFloat( val ) && jQuery.css( elem, "display", false, styles ) === "inline" ) {
+
+		val = elem[ "offset" + dimension[ 0 ].toUpperCase() + dimension.slice( 1 ) ];
+
+		// offsetWidth/offsetHeight provide border-box values
+		valueIsBorderBox = true;
 	}
 
-	// Normalize "", auto, and prepare for extra
+	// Normalize "" and auto
 	val = parseFloat( val ) || 0;
 
-	// Use the active box-sizing model to add/subtract irrelevant styles
+	// Adjust for the element's box model
 	return ( val +
-		augmentWidthOrHeight(
+		boxModelAdjustment(
 			elem,
-			name,
+			dimension,
 			extra || ( isBorderBox ? "border" : "content" ),
 			valueIsBorderBox,
-			styles
+			styles,
+
+			// Provide the current computed size to request scroll gutter calculation (gh-3589)
+			val
 		)
 	) + "px";
 }
@@ -7380,9 +7101,7 @@ jQuery.extend( {
 
 	// Add in properties whose names you wish to fix before
 	// setting or getting the value
-	cssProps: {
-		"float": "cssFloat"
-	},
+	cssProps: {},
 
 	// Get and set the style property on a DOM Node
 	style: function( elem, name, value, extra ) {
@@ -7394,7 +7113,7 @@ jQuery.extend( {
 
 		// Make sure that we're working with the right name
 		var ret, type, hooks,
-			origName = jQuery.camelCase( name ),
+			origName = camelCase( name ),
 			isCustomProp = rcustomProp.test( name ),
 			style = elem.style;
 
@@ -7462,7 +7181,7 @@ jQuery.extend( {
 
 	css: function( elem, name, extra, styles ) {
 		var val, num, hooks,
-			origName = jQuery.camelCase( name ),
+			origName = camelCase( name ),
 			isCustomProp = rcustomProp.test( name );
 
 		// Make sure that we're working with the right name. We don't
@@ -7500,8 +7219,8 @@ jQuery.extend( {
 	}
 } );
 
-jQuery.each( [ "height", "width" ], function( i, name ) {
-	jQuery.cssHooks[ name ] = {
+jQuery.each( [ "height", "width" ], function( i, dimension ) {
+	jQuery.cssHooks[ dimension ] = {
 		get: function( elem, computed, extra ) {
 			if ( computed ) {
 
@@ -7517,29 +7236,41 @@ jQuery.each( [ "height", "width" ], function( i, name ) {
 					// in IE throws an error.
 					( !elem.getClientRects().length || !elem.getBoundingClientRect().width ) ?
 						swap( elem, cssShow, function() {
-							return getWidthOrHeight( elem, name, extra );
+							return getWidthOrHeight( elem, dimension, extra );
 						} ) :
-						getWidthOrHeight( elem, name, extra );
+						getWidthOrHeight( elem, dimension, extra );
 			}
 		},
 
 		set: function( elem, value, extra ) {
 			var matches,
-				styles = extra && getStyles( elem ),
-				subtract = extra && augmentWidthOrHeight(
+				styles = getStyles( elem ),
+				isBorderBox = jQuery.css( elem, "boxSizing", false, styles ) === "border-box",
+				subtract = extra && boxModelAdjustment(
 					elem,
-					name,
+					dimension,
 					extra,
-					jQuery.css( elem, "boxSizing", false, styles ) === "border-box",
+					isBorderBox,
 					styles
 				);
+
+			// Account for unreliable border-box dimensions by comparing offset* to computed and
+			// faking a content-box to get border and padding (gh-3699)
+			if ( isBorderBox && support.scrollboxSize() === styles.position ) {
+				subtract -= Math.ceil(
+					elem[ "offset" + dimension[ 0 ].toUpperCase() + dimension.slice( 1 ) ] -
+					parseFloat( styles[ dimension ] ) -
+					boxModelAdjustment( elem, dimension, "border", false, styles ) -
+					0.5
+				);
+			}
 
 			// Convert to pixels if value adjustment is needed
 			if ( subtract && ( matches = rcssNum.exec( value ) ) &&
 				( matches[ 3 ] || "px" ) !== "px" ) {
 
-				elem.style[ name ] = value;
-				value = jQuery.css( elem, name );
+				elem.style[ dimension ] = value;
+				value = jQuery.css( elem, dimension );
 			}
 
 			return setPositiveNumber( elem, value, subtract );
@@ -7583,7 +7314,7 @@ jQuery.each( {
 		}
 	};
 
-	if ( !rmargin.test( prefix ) ) {
+	if ( prefix !== "margin" ) {
 		jQuery.cssHooks[ prefix + suffix ].set = setPositiveNumber;
 	}
 } );
@@ -7754,7 +7485,7 @@ function createFxNow() {
 	window.setTimeout( function() {
 		fxNow = undefined;
 	} );
-	return ( fxNow = jQuery.now() );
+	return ( fxNow = Date.now() );
 }
 
 // Generate parameters to create a standard animation
@@ -7858,9 +7589,10 @@ function defaultPrefilter( elem, props, opts ) {
 	// Restrict "overflow" and "display" styles during box animations
 	if ( isBox && elem.nodeType === 1 ) {
 
-		// Support: IE <=9 - 11, Edge 12 - 13
+		// Support: IE <=9 - 11, Edge 12 - 15
 		// Record all 3 overflow attributes because IE does not infer the shorthand
-		// from identically-valued overflowX and overflowY
+		// from identically-valued overflowX and overflowY and Edge just mirrors
+		// the overflowX value there.
 		opts.overflow = [ style.overflow, style.overflowX, style.overflowY ];
 
 		// Identify a display type, preferring old show/hide data over the CSS cascade
@@ -7968,7 +7700,7 @@ function propFilter( props, specialEasing ) {
 
 	// camelCase, specialEasing and expand cssHook pass
 	for ( index in props ) {
-		name = jQuery.camelCase( index );
+		name = camelCase( index );
 		easing = specialEasing[ name ];
 		value = props[ index ];
 		if ( Array.isArray( value ) ) {
@@ -8093,9 +7825,9 @@ function Animation( elem, properties, options ) {
 	for ( ; index < length; index++ ) {
 		result = Animation.prefilters[ index ].call( animation, elem, props, animation.opts );
 		if ( result ) {
-			if ( jQuery.isFunction( result.stop ) ) {
+			if ( isFunction( result.stop ) ) {
 				jQuery._queueHooks( animation.elem, animation.opts.queue ).stop =
-					jQuery.proxy( result.stop, result );
+					result.stop.bind( result );
 			}
 			return result;
 		}
@@ -8103,7 +7835,7 @@ function Animation( elem, properties, options ) {
 
 	jQuery.map( props, createTween, animation );
 
-	if ( jQuery.isFunction( animation.opts.start ) ) {
+	if ( isFunction( animation.opts.start ) ) {
 		animation.opts.start.call( elem, animation );
 	}
 
@@ -8136,7 +7868,7 @@ jQuery.Animation = jQuery.extend( Animation, {
 	},
 
 	tweener: function( props, callback ) {
-		if ( jQuery.isFunction( props ) ) {
+		if ( isFunction( props ) ) {
 			callback = props;
 			props = [ "*" ];
 		} else {
@@ -8168,9 +7900,9 @@ jQuery.Animation = jQuery.extend( Animation, {
 jQuery.speed = function( speed, easing, fn ) {
 	var opt = speed && typeof speed === "object" ? jQuery.extend( {}, speed ) : {
 		complete: fn || !fn && easing ||
-			jQuery.isFunction( speed ) && speed,
+			isFunction( speed ) && speed,
 		duration: speed,
-		easing: fn && easing || easing && !jQuery.isFunction( easing ) && easing
+		easing: fn && easing || easing && !isFunction( easing ) && easing
 	};
 
 	// Go to the end state if fx are off
@@ -8197,7 +7929,7 @@ jQuery.speed = function( speed, easing, fn ) {
 	opt.old = opt.complete;
 
 	opt.complete = function() {
-		if ( jQuery.isFunction( opt.old ) ) {
+		if ( isFunction( opt.old ) ) {
 			opt.old.call( this );
 		}
 
@@ -8361,7 +8093,7 @@ jQuery.fx.tick = function() {
 		i = 0,
 		timers = jQuery.timers;
 
-	fxNow = jQuery.now();
+	fxNow = Date.now();
 
 	for ( ; i < timers.length; i++ ) {
 		timer = timers[ i ];
@@ -8714,7 +8446,7 @@ jQuery.each( [
 
 
 	// Strip and collapse whitespace according to HTML spec
-	// https://html.spec.whatwg.org/multipage/infrastructure.html#strip-and-collapse-whitespace
+	// https://infra.spec.whatwg.org/#strip-and-collapse-ascii-whitespace
 	function stripAndCollapse( value ) {
 		var tokens = value.match( rnothtmlwhite ) || [];
 		return tokens.join( " " );
@@ -8725,20 +8457,30 @@ function getClass( elem ) {
 	return elem.getAttribute && elem.getAttribute( "class" ) || "";
 }
 
+function classesToArray( value ) {
+	if ( Array.isArray( value ) ) {
+		return value;
+	}
+	if ( typeof value === "string" ) {
+		return value.match( rnothtmlwhite ) || [];
+	}
+	return [];
+}
+
 jQuery.fn.extend( {
 	addClass: function( value ) {
 		var classes, elem, cur, curValue, clazz, j, finalValue,
 			i = 0;
 
-		if ( jQuery.isFunction( value ) ) {
+		if ( isFunction( value ) ) {
 			return this.each( function( j ) {
 				jQuery( this ).addClass( value.call( this, j, getClass( this ) ) );
 			} );
 		}
 
-		if ( typeof value === "string" && value ) {
-			classes = value.match( rnothtmlwhite ) || [];
+		classes = classesToArray( value );
 
+		if ( classes.length ) {
 			while ( ( elem = this[ i++ ] ) ) {
 				curValue = getClass( elem );
 				cur = elem.nodeType === 1 && ( " " + stripAndCollapse( curValue ) + " " );
@@ -8767,7 +8509,7 @@ jQuery.fn.extend( {
 		var classes, elem, cur, curValue, clazz, j, finalValue,
 			i = 0;
 
-		if ( jQuery.isFunction( value ) ) {
+		if ( isFunction( value ) ) {
 			return this.each( function( j ) {
 				jQuery( this ).removeClass( value.call( this, j, getClass( this ) ) );
 			} );
@@ -8777,9 +8519,9 @@ jQuery.fn.extend( {
 			return this.attr( "class", "" );
 		}
 
-		if ( typeof value === "string" && value ) {
-			classes = value.match( rnothtmlwhite ) || [];
+		classes = classesToArray( value );
 
+		if ( classes.length ) {
 			while ( ( elem = this[ i++ ] ) ) {
 				curValue = getClass( elem );
 
@@ -8809,13 +8551,14 @@ jQuery.fn.extend( {
 	},
 
 	toggleClass: function( value, stateVal ) {
-		var type = typeof value;
+		var type = typeof value,
+			isValidValue = type === "string" || Array.isArray( value );
 
-		if ( typeof stateVal === "boolean" && type === "string" ) {
+		if ( typeof stateVal === "boolean" && isValidValue ) {
 			return stateVal ? this.addClass( value ) : this.removeClass( value );
 		}
 
-		if ( jQuery.isFunction( value ) ) {
+		if ( isFunction( value ) ) {
 			return this.each( function( i ) {
 				jQuery( this ).toggleClass(
 					value.call( this, i, getClass( this ), stateVal ),
@@ -8827,12 +8570,12 @@ jQuery.fn.extend( {
 		return this.each( function() {
 			var className, i, self, classNames;
 
-			if ( type === "string" ) {
+			if ( isValidValue ) {
 
 				// Toggle individual class names
 				i = 0;
 				self = jQuery( this );
-				classNames = value.match( rnothtmlwhite ) || [];
+				classNames = classesToArray( value );
 
 				while ( ( className = classNames[ i++ ] ) ) {
 
@@ -8891,7 +8634,7 @@ var rreturn = /\r/g;
 
 jQuery.fn.extend( {
 	val: function( value ) {
-		var hooks, ret, isFunction,
+		var hooks, ret, valueIsFunction,
 			elem = this[ 0 ];
 
 		if ( !arguments.length ) {
@@ -8920,7 +8663,7 @@ jQuery.fn.extend( {
 			return;
 		}
 
-		isFunction = jQuery.isFunction( value );
+		valueIsFunction = isFunction( value );
 
 		return this.each( function( i ) {
 			var val;
@@ -8929,7 +8672,7 @@ jQuery.fn.extend( {
 				return;
 			}
 
-			if ( isFunction ) {
+			if ( valueIsFunction ) {
 				val = value.call( this, i, jQuery( this ).val() );
 			} else {
 				val = value;
@@ -9071,18 +8814,24 @@ jQuery.each( [ "radio", "checkbox" ], function() {
 // Return jQuery for attributes-only inclusion
 
 
-var rfocusMorph = /^(?:focusinfocus|focusoutblur)$/;
+support.focusin = "onfocusin" in window;
+
+
+var rfocusMorph = /^(?:focusinfocus|focusoutblur)$/,
+	stopPropagationCallback = function( e ) {
+		e.stopPropagation();
+	};
 
 jQuery.extend( jQuery.event, {
 
 	trigger: function( event, data, elem, onlyHandlers ) {
 
-		var i, cur, tmp, bubbleType, ontype, handle, special,
+		var i, cur, tmp, bubbleType, ontype, handle, special, lastElement,
 			eventPath = [ elem || document ],
 			type = hasOwn.call( event, "type" ) ? event.type : event,
 			namespaces = hasOwn.call( event, "namespace" ) ? event.namespace.split( "." ) : [];
 
-		cur = tmp = elem = elem || document;
+		cur = lastElement = tmp = elem = elem || document;
 
 		// Don't do events on text and comment nodes
 		if ( elem.nodeType === 3 || elem.nodeType === 8 ) {
@@ -9134,7 +8883,7 @@ jQuery.extend( jQuery.event, {
 
 		// Determine event propagation path in advance, per W3C events spec (#9951)
 		// Bubble up to document, then to window; watch for a global ownerDocument var (#9724)
-		if ( !onlyHandlers && !special.noBubble && !jQuery.isWindow( elem ) ) {
+		if ( !onlyHandlers && !special.noBubble && !isWindow( elem ) ) {
 
 			bubbleType = special.delegateType || type;
 			if ( !rfocusMorph.test( bubbleType + type ) ) {
@@ -9154,7 +8903,7 @@ jQuery.extend( jQuery.event, {
 		// Fire handlers on the event path
 		i = 0;
 		while ( ( cur = eventPath[ i++ ] ) && !event.isPropagationStopped() ) {
-
+			lastElement = cur;
 			event.type = i > 1 ?
 				bubbleType :
 				special.bindType || type;
@@ -9186,7 +8935,7 @@ jQuery.extend( jQuery.event, {
 
 				// Call a native DOM method on the target with the same name as the event.
 				// Don't do default actions on window, that's where global variables be (#6170)
-				if ( ontype && jQuery.isFunction( elem[ type ] ) && !jQuery.isWindow( elem ) ) {
+				if ( ontype && isFunction( elem[ type ] ) && !isWindow( elem ) ) {
 
 					// Don't re-trigger an onFOO event when we call its FOO() method
 					tmp = elem[ ontype ];
@@ -9197,7 +8946,17 @@ jQuery.extend( jQuery.event, {
 
 					// Prevent re-triggering of the same event, since we already bubbled it above
 					jQuery.event.triggered = type;
+
+					if ( event.isPropagationStopped() ) {
+						lastElement.addEventListener( type, stopPropagationCallback );
+					}
+
 					elem[ type ]();
+
+					if ( event.isPropagationStopped() ) {
+						lastElement.removeEventListener( type, stopPropagationCallback );
+					}
+
 					jQuery.event.triggered = undefined;
 
 					if ( tmp ) {
@@ -9243,31 +9002,6 @@ jQuery.fn.extend( {
 } );
 
 
-jQuery.each( ( "blur focus focusin focusout resize scroll click dblclick " +
-	"mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave " +
-	"change select submit keydown keypress keyup contextmenu" ).split( " " ),
-	function( i, name ) {
-
-	// Handle event binding
-	jQuery.fn[ name ] = function( data, fn ) {
-		return arguments.length > 0 ?
-			this.on( name, null, data, fn ) :
-			this.trigger( name );
-	};
-} );
-
-jQuery.fn.extend( {
-	hover: function( fnOver, fnOut ) {
-		return this.mouseenter( fnOver ).mouseleave( fnOut || fnOver );
-	}
-} );
-
-
-
-
-support.focusin = "onfocusin" in window;
-
-
 // Support: Firefox <=44
 // Firefox doesn't have focus(in | out) events
 // Related ticket - https://bugzilla.mozilla.org/show_bug.cgi?id=687787
@@ -9311,7 +9045,7 @@ if ( !support.focusin ) {
 }
 var location = window.location;
 
-var nonce = jQuery.now();
+var nonce = Date.now();
 
 var rquery = ( /\?/ );
 
@@ -9369,7 +9103,7 @@ function buildParams( prefix, obj, traditional, add ) {
 			}
 		} );
 
-	} else if ( !traditional && jQuery.type( obj ) === "object" ) {
+	} else if ( !traditional && toType( obj ) === "object" ) {
 
 		// Serialize object item.
 		for ( name in obj ) {
@@ -9391,7 +9125,7 @@ jQuery.param = function( a, traditional ) {
 		add = function( key, valueOrFunction ) {
 
 			// If value is a function, invoke it and use its return value
-			var value = jQuery.isFunction( valueOrFunction ) ?
+			var value = isFunction( valueOrFunction ) ?
 				valueOrFunction() :
 				valueOrFunction;
 
@@ -9509,7 +9243,7 @@ function addToPrefiltersOrTransports( structure ) {
 			i = 0,
 			dataTypes = dataTypeExpression.toLowerCase().match( rnothtmlwhite ) || [];
 
-		if ( jQuery.isFunction( func ) ) {
+		if ( isFunction( func ) ) {
 
 			// For each dataType in the dataTypeExpression
 			while ( ( dataType = dataTypes[ i++ ] ) ) {
@@ -9981,7 +9715,7 @@ jQuery.extend( {
 		if ( s.crossDomain == null ) {
 			urlAnchor = document.createElement( "a" );
 
-			// Support: IE <=8 - 11, Edge 12 - 13
+			// Support: IE <=8 - 11, Edge 12 - 15
 			// IE throws exception on accessing the href property if url is malformed,
 			// e.g. http://example.com:80x/
 			try {
@@ -10039,8 +9773,8 @@ jQuery.extend( {
 			// Remember the hash so we can put it back
 			uncached = s.url.slice( cacheURL.length );
 
-			// If data is available, append data to url
-			if ( s.data ) {
+			// If data is available and should be processed, append data to url
+			if ( s.data && ( s.processData || typeof s.data === "string" ) ) {
 				cacheURL += ( rquery.test( cacheURL ) ? "&" : "?" ) + s.data;
 
 				// #9682: remove data so that it's not used in an eventual retry
@@ -10277,7 +10011,7 @@ jQuery.each( [ "get", "post" ], function( i, method ) {
 	jQuery[ method ] = function( url, data, callback, type ) {
 
 		// Shift arguments if data argument was omitted
-		if ( jQuery.isFunction( data ) ) {
+		if ( isFunction( data ) ) {
 			type = type || callback;
 			callback = data;
 			data = undefined;
@@ -10315,7 +10049,7 @@ jQuery.fn.extend( {
 		var wrap;
 
 		if ( this[ 0 ] ) {
-			if ( jQuery.isFunction( html ) ) {
+			if ( isFunction( html ) ) {
 				html = html.call( this[ 0 ] );
 			}
 
@@ -10341,7 +10075,7 @@ jQuery.fn.extend( {
 	},
 
 	wrapInner: function( html ) {
-		if ( jQuery.isFunction( html ) ) {
+		if ( isFunction( html ) ) {
 			return this.each( function( i ) {
 				jQuery( this ).wrapInner( html.call( this, i ) );
 			} );
@@ -10361,10 +10095,10 @@ jQuery.fn.extend( {
 	},
 
 	wrap: function( html ) {
-		var isFunction = jQuery.isFunction( html );
+		var htmlIsFunction = isFunction( html );
 
 		return this.each( function( i ) {
-			jQuery( this ).wrapAll( isFunction ? html.call( this, i ) : html );
+			jQuery( this ).wrapAll( htmlIsFunction ? html.call( this, i ) : html );
 		} );
 	},
 
@@ -10456,7 +10190,8 @@ jQuery.ajaxTransport( function( options ) {
 					return function() {
 						if ( callback ) {
 							callback = errorCallback = xhr.onload =
-								xhr.onerror = xhr.onabort = xhr.onreadystatechange = null;
+								xhr.onerror = xhr.onabort = xhr.ontimeout =
+									xhr.onreadystatechange = null;
 
 							if ( type === "abort" ) {
 								xhr.abort();
@@ -10496,7 +10231,7 @@ jQuery.ajaxTransport( function( options ) {
 
 				// Listen to events
 				xhr.onload = callback();
-				errorCallback = xhr.onerror = callback( "error" );
+				errorCallback = xhr.onerror = xhr.ontimeout = callback( "error" );
 
 				// Support: IE 9 only
 				// Use onreadystatechange to replace onabort
@@ -10650,7 +10385,7 @@ jQuery.ajaxPrefilter( "json jsonp", function( s, originalSettings, jqXHR ) {
 	if ( jsonProp || s.dataTypes[ 0 ] === "jsonp" ) {
 
 		// Get callback name, remembering preexisting value associated with it
-		callbackName = s.jsonpCallback = jQuery.isFunction( s.jsonpCallback ) ?
+		callbackName = s.jsonpCallback = isFunction( s.jsonpCallback ) ?
 			s.jsonpCallback() :
 			s.jsonpCallback;
 
@@ -10701,7 +10436,7 @@ jQuery.ajaxPrefilter( "json jsonp", function( s, originalSettings, jqXHR ) {
 			}
 
 			// Call if it was a function and we have a response
-			if ( responseContainer && jQuery.isFunction( overwritten ) ) {
+			if ( responseContainer && isFunction( overwritten ) ) {
 				overwritten( responseContainer[ 0 ] );
 			}
 
@@ -10793,7 +10528,7 @@ jQuery.fn.load = function( url, params, callback ) {
 	}
 
 	// If it's a function
-	if ( jQuery.isFunction( params ) ) {
+	if ( isFunction( params ) ) {
 
 		// We assume that it's the callback
 		callback = params;
@@ -10901,7 +10636,7 @@ jQuery.offset = {
 			curLeft = parseFloat( curCSSLeft ) || 0;
 		}
 
-		if ( jQuery.isFunction( options ) ) {
+		if ( isFunction( options ) ) {
 
 			// Use jQuery.extend here to allow modification of coordinates argument (gh-1848)
 			options = options.call( elem, i, jQuery.extend( {}, curOffset ) );
@@ -10924,6 +10659,8 @@ jQuery.offset = {
 };
 
 jQuery.fn.extend( {
+
+	// offset() relates an element's border box to the document origin
 	offset: function( options ) {
 
 		// Preserve chaining for setter
@@ -10935,7 +10672,7 @@ jQuery.fn.extend( {
 				} );
 		}
 
-		var doc, docElem, rect, win,
+		var rect, win,
 			elem = this[ 0 ];
 
 		if ( !elem ) {
@@ -10950,50 +10687,52 @@ jQuery.fn.extend( {
 			return { top: 0, left: 0 };
 		}
 
+		// Get document-relative position by adding viewport scroll to viewport-relative gBCR
 		rect = elem.getBoundingClientRect();
-
-		doc = elem.ownerDocument;
-		docElem = doc.documentElement;
-		win = doc.defaultView;
-
+		win = elem.ownerDocument.defaultView;
 		return {
-			top: rect.top + win.pageYOffset - docElem.clientTop,
-			left: rect.left + win.pageXOffset - docElem.clientLeft
+			top: rect.top + win.pageYOffset,
+			left: rect.left + win.pageXOffset
 		};
 	},
 
+	// position() relates an element's margin box to its offset parent's padding box
+	// This corresponds to the behavior of CSS absolute positioning
 	position: function() {
 		if ( !this[ 0 ] ) {
 			return;
 		}
 
-		var offsetParent, offset,
+		var offsetParent, offset, doc,
 			elem = this[ 0 ],
 			parentOffset = { top: 0, left: 0 };
 
-		// Fixed elements are offset from window (parentOffset = {top:0, left: 0},
-		// because it is its only offset parent
+		// position:fixed elements are offset from the viewport, which itself always has zero offset
 		if ( jQuery.css( elem, "position" ) === "fixed" ) {
 
-			// Assume getBoundingClientRect is there when computed position is fixed
+			// Assume position:fixed implies availability of getBoundingClientRect
 			offset = elem.getBoundingClientRect();
 
 		} else {
-
-			// Get *real* offsetParent
-			offsetParent = this.offsetParent();
-
-			// Get correct offsets
 			offset = this.offset();
-			if ( !nodeName( offsetParent[ 0 ], "html" ) ) {
-				parentOffset = offsetParent.offset();
-			}
 
-			// Add offsetParent borders
-			parentOffset = {
-				top: parentOffset.top + jQuery.css( offsetParent[ 0 ], "borderTopWidth", true ),
-				left: parentOffset.left + jQuery.css( offsetParent[ 0 ], "borderLeftWidth", true )
-			};
+			// Account for the *real* offset parent, which can be the document or its root element
+			// when a statically positioned element is identified
+			doc = elem.ownerDocument;
+			offsetParent = elem.offsetParent || doc.documentElement;
+			while ( offsetParent &&
+				( offsetParent === doc.body || offsetParent === doc.documentElement ) &&
+				jQuery.css( offsetParent, "position" ) === "static" ) {
+
+				offsetParent = offsetParent.parentNode;
+			}
+			if ( offsetParent && offsetParent !== elem && offsetParent.nodeType === 1 ) {
+
+				// Incorporate borders into its offset, since they are outside its content origin
+				parentOffset = jQuery( offsetParent ).offset();
+				parentOffset.top += jQuery.css( offsetParent, "borderTopWidth", true );
+				parentOffset.left += jQuery.css( offsetParent, "borderLeftWidth", true );
+			}
 		}
 
 		// Subtract parent offsets and element margins
@@ -11035,7 +10774,7 @@ jQuery.each( { scrollLeft: "pageXOffset", scrollTop: "pageYOffset" }, function( 
 
 			// Coalesce documents and windows
 			var win;
-			if ( jQuery.isWindow( elem ) ) {
+			if ( isWindow( elem ) ) {
 				win = elem;
 			} else if ( elem.nodeType === 9 ) {
 				win = elem.defaultView;
@@ -11093,7 +10832,7 @@ jQuery.each( { Height: "height", Width: "width" }, function( name, type ) {
 			return access( this, function( elem, type, value ) {
 				var doc;
 
-				if ( jQuery.isWindow( elem ) ) {
+				if ( isWindow( elem ) ) {
 
 					// $( window ).outerWidth/Height return w/h including scrollbars (gh-1729)
 					return funcName.indexOf( "outer" ) === 0 ?
@@ -11127,6 +10866,28 @@ jQuery.each( { Height: "height", Width: "width" }, function( name, type ) {
 } );
 
 
+jQuery.each( ( "blur focus focusin focusout resize scroll click dblclick " +
+	"mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave " +
+	"change select submit keydown keypress keyup contextmenu" ).split( " " ),
+	function( i, name ) {
+
+	// Handle event binding
+	jQuery.fn[ name ] = function( data, fn ) {
+		return arguments.length > 0 ?
+			this.on( name, null, data, fn ) :
+			this.trigger( name );
+	};
+} );
+
+jQuery.fn.extend( {
+	hover: function( fnOver, fnOut ) {
+		return this.mouseenter( fnOver ).mouseleave( fnOut || fnOver );
+	}
+} );
+
+
+
+
 jQuery.fn.extend( {
 
 	bind: function( types, data, fn ) {
@@ -11148,6 +10909,37 @@ jQuery.fn.extend( {
 	}
 } );
 
+// Bind a function to a context, optionally partially applying any
+// arguments.
+// jQuery.proxy is deprecated to promote standards (specifically Function#bind)
+// However, it is not slated for removal any time soon
+jQuery.proxy = function( fn, context ) {
+	var tmp, args, proxy;
+
+	if ( typeof context === "string" ) {
+		tmp = fn[ context ];
+		context = fn;
+		fn = tmp;
+	}
+
+	// Quick check to determine if target is callable, in the spec
+	// this throws a TypeError, but we will just return undefined.
+	if ( !isFunction( fn ) ) {
+		return undefined;
+	}
+
+	// Simulated bind
+	args = slice.call( arguments, 2 );
+	proxy = function() {
+		return fn.apply( context || this, args.concat( slice.call( arguments ) ) );
+	};
+
+	// Set the guid of unique handler to the same of original handler, so it can be removed
+	proxy.guid = fn.guid = fn.guid || jQuery.guid++;
+
+	return proxy;
+};
+
 jQuery.holdReady = function( hold ) {
 	if ( hold ) {
 		jQuery.readyWait++;
@@ -11158,6 +10950,26 @@ jQuery.holdReady = function( hold ) {
 jQuery.isArray = Array.isArray;
 jQuery.parseJSON = JSON.parse;
 jQuery.nodeName = nodeName;
+jQuery.isFunction = isFunction;
+jQuery.isWindow = isWindow;
+jQuery.camelCase = camelCase;
+jQuery.type = toType;
+
+jQuery.now = Date.now;
+
+jQuery.isNumeric = function( obj ) {
+
+	// As of jQuery 3.0, isNumeric is limited to
+	// strings and numbers (primitives or objects)
+	// that can be coerced to finite numbers (gh-2662)
+	var type = jQuery.type( obj );
+	return ( type === "number" || type === "string" ) &&
+
+		// parseFloat NaNs numeric-cast false positives ("")
+		// ...but misinterprets leading-number strings, particularly hex literals ("0x...")
+		// subtraction forces infinities to NaN
+		!isNaN( obj - parseFloat( obj ) );
+};
 
 
 
