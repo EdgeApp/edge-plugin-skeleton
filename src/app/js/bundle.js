@@ -133,12 +133,16 @@ const updateWallets = function () {
         __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#addressData').val(reason)
       })
     }
-    // $('#walletsData').val(JSON.stringify(data))
+    __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#walletsData').val(JSON.stringify(data))
     __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#walletSelection').change(() => {
       const id = __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#walletSelection option:selected').val()
       const wallet = wallets.find((wallet) => wallet.id === id)
       if (wallet) {
-        __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#walletsData').val(JSON.stringify(wallet))
+        __WEBPACK_IMPORTED_MODULE_0_edge_libplugin__["b" /* core */].getAddress(wallet.id, wallet.currencyCode).then(data => {
+          return __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#addressData').val(JSON.stringify(data))
+        }).catch(reason => {
+          __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#addressData').val(reason)
+        })
       }
     })
     return true

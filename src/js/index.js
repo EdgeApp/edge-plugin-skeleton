@@ -59,12 +59,16 @@ const updateWallets = function () {
         $('#addressData').val(reason)
       })
     }
-    // $('#walletsData').val(JSON.stringify(data))
+    $('#walletsData').val(JSON.stringify(data))
     $('#walletSelection').change(() => {
       const id = $('#walletSelection option:selected').val()
       const wallet = wallets.find((wallet) => wallet.id === id)
       if (wallet) {
-        $('#walletsData').val(JSON.stringify(wallet))
+        core.getAddress(wallet.id, wallet.currencyCode).then(data => {
+          return $('#addressData').val(JSON.stringify(data))
+        }).catch(reason => {
+          $('#addressData').val(reason)
+        })
       }
     })
     return true
