@@ -75,6 +75,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
+let wallets = []
+
 __WEBPACK_IMPORTED_MODULE_0_edge_libplugin__["a" /* config */].get('API_TOKEN')
   .then(data => {
     __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#apiToken').html(data)
@@ -120,9 +122,10 @@ __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#clearData').click(function () {
 const updateWallets = function () {
   __WEBPACK_IMPORTED_MODULE_0_edge_libplugin__["b" /* core */].wallets().then((data) => {
     if (data.length > 0) {
+      wallets = data
       const wallet = data[0]
       data.forEach(item => {
-        __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#walletSelection').append('<option>' + item.currencyCode + ' - ' + item.id + '</option>')
+        __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#walletSelection').append('<option value="' + item.id + '">' + item.currencyCode + ' - ' + item.id + '</option>')
       })
       __WEBPACK_IMPORTED_MODULE_0_edge_libplugin__["b" /* core */].getAddress(wallet.id, wallet.currencyCode).then(data => {
         return __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#addressData').val(JSON.stringify(data))
@@ -130,7 +133,14 @@ const updateWallets = function () {
         __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#addressData').val(reason)
       })
     }
-    __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#walletsData').val(JSON.stringify(data))
+    // $('#walletsData').val(JSON.stringify(data))
+    __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#walletSelection').change(() => {
+      const id = __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#walletSelection option:selected').val()
+      const wallet = wallets.find((wallet) => wallet.id === id)
+      if (wallet) {
+        __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#walletsData').val(JSON.stringify(wallet))
+      }
+    })
     return true
   })
     .catch((reason) => {

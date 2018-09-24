@@ -1,6 +1,8 @@
 import { core, config, ui } from 'edge-libplugin'
 import $ from 'jquery'
 
+let wallets = []
+
 config.get('API_TOKEN')
   .then(data => {
     $('#apiToken').html(data)
@@ -46,9 +48,10 @@ $('#clearData').click(function () {
 const updateWallets = function () {
   core.wallets().then((data) => {
     if (data.length > 0) {
+      wallets = data
       const wallet = data[0]
       data.forEach(item => {
-        $('#walletSelection').append('<option>' + item.currencyCode + ' - ' + item.id + '</option>')
+        $('#walletSelection').append('<option value="' + item.id + '">' + item.currencyCode + ' - ' + item.id + '</option>')
       })
       core.getAddress(wallet.id, wallet.currencyCode).then(data => {
         return $('#addressData').val(JSON.stringify(data))
@@ -56,7 +59,14 @@ const updateWallets = function () {
         $('#addressData').val(reason)
       })
     }
-    $('#walletsData').val(JSON.stringify(data))
+    // $('#walletsData').val(JSON.stringify(data))
+    $('#walletSelection').change(() => {
+      const id = $('#walletSelection option:selected').val()
+      const wallet = wallets.find((wallet) => wallet.id === id)
+      if (wallet) {
+        $('#walletsData').val(JSON.stringify(wallet))
+      }
+    })
     return true
   })
     .catch((reason) => {
