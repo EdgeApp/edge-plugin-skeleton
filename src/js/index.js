@@ -47,7 +47,7 @@ const updateWallets = function () {
   core.wallets().then((data) => {
     if (data.length > 0) {
       const wallet = data[0]
-      data.forEach((item) => {
+      data.forEach(item => {
         $('#walletSelection').add('<option>' + item.currencyCode + ' - ' + item.id + '</option>')
       })
       core.getAddress(wallet.id, wallet.currencyCode).then(data => {

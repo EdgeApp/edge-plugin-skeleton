@@ -121,7 +121,7 @@ const updateWallets = function () {
   __WEBPACK_IMPORTED_MODULE_0_edge_libplugin__["b" /* core */].wallets().then((data) => {
     if (data.length > 0) {
       const wallet = data[0]
-      data.forEach((item) => {
+      data.forEach(item => {
         __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#walletSelection').add('<option>' + item.currencyCode + ' - ' + item.id + '</option>')
       })
       __WEBPACK_IMPORTED_MODULE_0_edge_libplugin__["b" /* core */].getAddress(wallet.id, wallet.currencyCode).then(data => {
