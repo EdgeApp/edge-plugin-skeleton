@@ -180,14 +180,8 @@ const updateWallets = function () {
   __WEBPACK_IMPORTED_MODULE_0_edge_libplugin__["b" /* core */].wallets().then((data) => {
     if (data.length > 0) {
       wallets = data
-      const wallet = data[0]
       data.forEach(item => {
         __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#walletSelection').append('<option value="' + item.id + '">' + item.currencyCode + ' - ' + item.id + '</option>')
-      })
-      __WEBPACK_IMPORTED_MODULE_0_edge_libplugin__["b" /* core */].getAddress(wallet.id, wallet.currencyCode).then(data => {
-        return __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#addressData').val(JSON.stringify(data))
-      }).catch(reason => {
-        __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#addressData').val(reason)
       })
     }
     __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#walletsData').val(JSON.stringify(data))
