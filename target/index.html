@@ -37,7 +37,7 @@
   <button id="wallets">Wallets</button><br>
   <textarea id="walletsData" style="width: 100%" rows="10">
   </textarea>
-  Commit: 3
+  Commit: 4
   <p>Choose Wallet:</p>
   <select id="walletSelection">
 
@@ -179,8 +179,8 @@ const updateWallets = function () {
   __WEBPACK_IMPORTED_MODULE_0_edge_libplugin__["b" /* core */].wallets().then((data) => {
     if (data.length > 0) {
       const wallet = data[0]
-      __WEBPACK_IMPORTED_MODULE_1_jquery___default.a.each(data, (index, value) => {
-        __WEBPACK_IMPORTED_MODULE_1_jquery___default()('walletSelection').add('<option>' + value.currencyCode + ' - ' + value.id + '</option>')
+      data.forEach((item) => {
+        __WEBPACK_IMPORTED_MODULE_1_jquery___default()('walletSelection').add('<option>' + item.currencyCode + ' - ' + item.id + '</option>')
       })
       __WEBPACK_IMPORTED_MODULE_0_edge_libplugin__["b" /* core */].getAddress(wallet.id, wallet.currencyCode).then(data => {
         return __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#addressData').val(JSON.stringify(data))
