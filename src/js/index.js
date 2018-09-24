@@ -45,6 +45,7 @@ $('#clearData').click(function () {
 
 const updateWallets = function () {
   core.wallets().then((data) => {
+    console.log('wallet data is: ', data)
     if (data.length > 0) {
       const wallet = data[0]
       core.getAddress(wallet.id, wallet.currencyCode).then(data => {

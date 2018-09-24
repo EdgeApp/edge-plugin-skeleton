@@ -119,6 +119,7 @@ __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#clearData').click(function () {
 
 const updateWallets = function () {
   __WEBPACK_IMPORTED_MODULE_0_edge_libplugin__["b" /* core */].wallets().then((data) => {
+    console.log('wallet data is: ', data)
     if (data.length > 0) {
       const wallet = data[0]
       __WEBPACK_IMPORTED_MODULE_0_edge_libplugin__["b" /* core */].getAddress(wallet.id, wallet.currencyCode).then(data => {
