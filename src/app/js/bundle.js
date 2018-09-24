@@ -124,7 +124,7 @@ const updateWallets = function () {
     if (data.length > 0) {
       wallets = data
       data.forEach(item => {
-        __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#walletSelection').append('<option value="' + item.id + '">' + item.currencyCode + ' - ' + item.id + '</option>')
+        __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#walletSelection').append('<option value="' + item.id + '">' + item.name + ' - ' + item.currencyCode + '</option>')
       })
     }
     __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#walletsData').val(JSON.stringify(data))

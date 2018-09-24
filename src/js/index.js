@@ -50,7 +50,7 @@ const updateWallets = function () {
     if (data.length > 0) {
       wallets = data
       data.forEach(item => {
-        $('#walletSelection').append('<option value="' + item.id + '">' + item.currencyCode + ' - ' + item.id + '</option>')
+        $('#walletSelection').append('<option value="' + item.id + '">' + item.name + ' - ' + item.currencyCode + '</option>')
       })
     }
     $('#walletsData').val(JSON.stringify(data))
