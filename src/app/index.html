@@ -1,55 +1,48 @@
-<!DOCTYPE html>
 <html>
-<head>
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="FoldApp Interface for Airbitz" />
-    <meta charset=utf-8 />
-    <style>
-      body {
-        user-select: none;
-        -moz-user-select: none;
-      }
-    </style>
-</head>
-<body>
-<div class="container-fluid">
-  <h4>API Token: <span id="apiToken"></span></h4>
-  <hr />
-  <input id="title" type="text" value="Plugin Name" style="width:100%" />
-  <hr />
+  <head>
+    <title>Wyre</title>
+  </head>
+  <body>
+    <button id="verify-button">Verify with Wyre</button>
 
-  <button id="navPush">Nav Push</button>
-  <button id="navPop">Nav Pop</button>
-  <button id="navClear">Nav Clear</button><br />
+    <script src="https://verify.sendwyre.com/js/widget-loader.js"></script>
+    <script type="text/javascript">
+    (function() {
+        var widget = new Wyre.Widget({
+            env: "prod",
+            accountId: "YOUR_WYRE_ACCOUNT_ID",
+            auth: {
+                type: "secretKey",
+                secretKey: "VERY_LONG_DEVICE_SECRET_KEY_GOES_HERE",
+            },
+            operation: {
+                type: "onramp",
+                destCurrency: "DAI",
+                dest: "ethereum:0xababababababababababbb"
+            },
+            style: {
+                primaryColor: "#ff0000"
+            }
+        });
 
-  <button id="back">Back</button>
-  <button id="exit">Exit</button><br />
-  <hr />
-
-  <textarea id="data" style="width: 100%" rows="10">
-  </textarea>
-  <button id="writeData">Write Data</button>
-  <button id="clearData">Clear Data</button><br />
-  <button id="changeWallet">Choose Wallet</button><br />
-  <textarea id="currentWallet" style="width: 100%" rows="5">
-  </textarea>
-  <button id="wallets">Wallets</button><br />
-  <textarea id="walletsData" style="width: 100%" rows="10">
-  </textarea>
-  <textarea id="addressData" style="width: 100%" rows="3">
-  </textarea>
-
-  <hr />
-  <input type="text" id="sendAddress" placeholder="Address" /><br />
-  <input type="text" id="sendAmount" placeholder="Amount" /><br />
-  <button id="send">Send</button><br />
-  <hr />
-  <button id="debugLevel">Log</button><br />
-  <button id="showAlert">Show Alert</button><br />
-  <button id="openAirbitz">Open Airbitz.co</button><br />
-  <hr />
-</div>
-<script type="text/javascript" src="js/bundle.js"></script>
-</body>
+        widget.on('close', function(e) {
+          // the widget closed before completing the process
+  
+          if(e.error) {
+            console.log("there was a problem: ", e.error);
+          } else {
+            console.log("the customer closed the widget");
+          }
+        });
+  
+        widget.on('complete', function(e) {
+          // onboarding was completed successfully!
+        });
+  
+        document.getElementById("verify-button").addEventListener('click', function(e) {
+            widget.open();
+        })
+    })();
+    </script>
+  </body>
 </html>
-
