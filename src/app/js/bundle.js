@@ -223,6 +223,39 @@ __WEBPACK_IMPORTED_MODULE_1_jquery___default()('#exit').click(function () {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return config; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return ui; });
 /* unused harmony export utils */
+function awaitPostMessage() {
+  var isReactNativePostMessageReady = !!window.originalPostMessage;
+  var queue = [];
+  var currentPostMessageFn = function store(message) {
+    if (queue.length > 100) queue.shift();
+    queue.push(message);
+  };
+  if (!isReactNativePostMessageReady) {
+    var originalPostMessage = window.postMessage;
+    Object.defineProperty(window, 'postMessage', {
+      configurable: true,
+      enumerable: true,
+      get: function get() {
+        return currentPostMessageFn;
+      },
+      set: function set(fn) {
+        currentPostMessageFn = fn;
+        isReactNativePostMessageReady = true;
+        setTimeout(sendQueue, 0);
+      }
+    });
+    window.postMessage.toString = function () {
+      return String(originalPostMessage);
+    };
+  }
+
+  function sendQueue() {
+    while (queue.length > 0) {
+      window.postMessage(queue.shift());
+    }
+  }
+}
+awaitPostMessage();
 // Repurposed ideas from: https://gist.github.com/blankg/d5537a458b55b9d15cb4fd78258ad840
 var promiseChain = new Promise(function (resolve, reject) {
   function tryAgain() {
