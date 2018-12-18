@@ -19,7 +19,7 @@
     "test": "npm run lint:fix",
     "precommit": "npm test"
   },
-  "author": "Kylan Hurt <kylan@edge.app>",
+  "author": "Tim Horton <tim@edgesecure.co>",
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {},
   "devDependencies": {
@@ -32,6 +32,7 @@
     "eslint-plugin-node": "^5.0.0",
     "eslint-plugin-promise": "^3.4.0",
     "eslint-plugin-standard": "^3.0.1",
+    "flow-bin": "^0.54.1",
     "husky": "^0.14.3",
     "jquery": "^3.2.1",
     "rimraf": "^2.5.4",
